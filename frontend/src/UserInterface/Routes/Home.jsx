@@ -18,7 +18,7 @@ const Home = ({ addBookmark }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/herbs")
+      .get("http://localhost:5001/api/herbs")
       .then((res) => setPlants(res.data))
       .catch((err) => console.error("Error fetching plants:", err));
   }, []);
@@ -26,7 +26,7 @@ const Home = ({ addBookmark }) => {
   useEffect(() => {
     let timer;
     if (isNotificationVisible) {
-      timer = setTimeout(() => setIsNotificationVisible(false), 5000);
+      timer = setTimeout(() => setIsNotificationVisible(false), 5001);
     }
     return () => clearTimeout(timer);
   }, [isNotificationVisible]);
@@ -53,7 +53,7 @@ const Home = ({ addBookmark }) => {
       });
 
       const response = await axios.post(
-        "http://localhost:5000/api/users/bookmark",
+        "http://localhost:5001/api/users/bookmark",
         { 
           userId: user._id,
           plantId: plant._id

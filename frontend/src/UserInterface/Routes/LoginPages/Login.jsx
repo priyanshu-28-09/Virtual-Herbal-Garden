@@ -72,7 +72,7 @@ export default function HerbalLogin({ setIsAuthenticated, setUserRole }) {
       });
 
       const response = await axios.post(
-        "http://localhost:5000/api/users/login",
+        "http://localhost:5001/api/users/login",
         {
           email: email.trim(),
           password: password.trim(),
@@ -141,7 +141,7 @@ export default function HerbalLogin({ setIsAuthenticated, setUserRole }) {
       if (err.code === 'ECONNABORTED') {
         setError("Request timeout. Please try again.");
       } else if (err.code === 'ERR_NETWORK' || err.code === 'ECONNREFUSED') {
-        setError("Cannot connect to server. Please check if the backend is running on port 5000.");
+        setError("Cannot connect to server. Please check if the backend is running on port 5001.");
       } else if (err.response?.status === 400) {
         setError(err.response.data?.message || "Invalid email or password.");
       } else if (err.response?.status === 401) {
@@ -180,15 +180,15 @@ export default function HerbalLogin({ setIsAuthenticated, setUserRole }) {
   const testBackendConnection = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("http://localhost:5000/api/health", {
-        timeout: 5000
+      const response = await axios.get("http://localhost:5001/api/health", {
+        timeout: 5001
       });
       console.log("✅ Backend connection successful:", response.data);
       alert("Backend is running! ✅");
       return true;
     } catch (err) {
       console.error("❌ Backend connection failed:", err);
-      alert("Backend is NOT running! ❌\nMake sure your server is running on port 5000.");
+      alert("Backend is NOT running! ❌\nMake sure your server is running on port 5001.");
       return false;
     } finally {
       setIsLoading(false);

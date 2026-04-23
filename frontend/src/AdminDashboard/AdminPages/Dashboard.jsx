@@ -14,7 +14,7 @@ const Dashboard = () => {
   console.log(counts);
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/herbs")
+      .get("http://localhost:5001/api/herbs")
       .then((res) => setPlant(res.data))
       .catch((err) => console.error("Error fetching plants:", err));
   }, []);
@@ -24,7 +24,7 @@ const Dashboard = () => {
 useEffect(() => {
     const fetchCounts = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/users/getCount');
+            const response = await fetch('http://localhost:5001/api/users/getCount');
             const data = await response.json();
             setCounts(data);
         } catch (error) {

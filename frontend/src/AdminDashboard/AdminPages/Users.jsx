@@ -26,7 +26,7 @@ const Users = () => {
       const token = localStorage.getItem('token');
       
       // ✅ ADDED: Send token in headers
-      const response = await axios.get('http://localhost:5000/api/users/userData', {
+      const response = await axios.get('http://localhost:5001/api/users/userData', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -62,7 +62,7 @@ const Users = () => {
     // Hide the notification after 5 seconds
     setTimeout(() => {
       setNotification({ message: "", color: "", visible: false });
-    }, 5000);
+    }, 5001);
   };
 
   // Block user function - ENHANCED
@@ -86,7 +86,7 @@ const Users = () => {
       
       // Call your backend API to block the user
       await axios.put(
-        `http://localhost:5000/api/users/block/${id}`, 
+        `http://localhost:5001/api/users/block/${id}`, 
         { isActive: false },
         {
           headers: {
@@ -127,7 +127,7 @@ const Users = () => {
       
       // Call your backend API to unblock the user
       await axios.put(
-        `http://localhost:5000/api/users/block/${id}`, 
+        `http://localhost:5001/api/users/block/${id}`, 
         { isActive: true },
         {
           headers: {
@@ -177,7 +177,7 @@ const Users = () => {
         
         // Call your backend API to delete the user
         const response = await axios.delete(
-          `http://localhost:5000/api/users/delete/${id}`,
+          `http://localhost:5001/api/users/delete/${id}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`

@@ -29,10 +29,10 @@ function Register() {
 
     try {
       // Choose the correct endpoint based on role
-      let endpoint = 'http://localhost:5000/api/users/register';
+      let endpoint = 'http://localhost:5001/api/users/register';
       
       if (selectedRole === 'content-creator') {
-        endpoint = 'http://localhost:5000/api/users/create-content-creator';
+        endpoint = 'http://localhost:5001/api/users/create-content-creator';
       }
 
       const response = await axios.post(endpoint, {

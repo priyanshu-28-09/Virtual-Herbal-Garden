@@ -37,7 +37,7 @@ const AuthProvider = ({ children }) => {
   const getHerbs = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/herbs', {
+      const response = await fetch('http://localhost:5001/api/herbs', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -31,7 +31,7 @@ const Bookmarks = () => {
         console.log("Fetching bookmarks for IDs:", user.bookmarks);
 
         // ✅ FIX 2: Correct API endpoint - should be /api/herbs not /api/herbb
-        const response = await axios.get("http://localhost:5000/api/herbs/bookmarks", {
+        const response = await axios.get("http://localhost:5001/api/herbs/bookmarks", {
           params: { ids: user.bookmarks.join(',') },
           headers: { 
             'Authorization': `Bearer ${token}`,
@@ -68,7 +68,7 @@ const Bookmarks = () => {
 
       // ✅ FIX 3: Correct endpoint spelling - romovebookmark -> removebookmark
       const response = await axios.post(
-        "http://localhost:5000/api/users/removebookmark",
+        "http://localhost:5001/api/users/removebookmark",
         {
           userId: user._id,
           plantId: plant._id

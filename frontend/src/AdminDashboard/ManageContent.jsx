@@ -17,7 +17,7 @@ const ManageContent = () => {
   const fetchHerbs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:5000/api/herbs");
+      const response = await axios.get("http://localhost:5001/api/herbs");
       setHerbs(response.data);
       setLoading(false);
     } catch (error) {
@@ -33,7 +33,7 @@ const ManageContent = () => {
 
     setTimeout(() => {
       setNotification({ message: "", color: "", visible: false });
-    }, 5000);
+    }, 5001);
   };
 
   // Delete herb function
@@ -42,7 +42,7 @@ const ManageContent = () => {
     if (herb) {
       if (window.confirm(`Are you sure you want to delete ${herb.name}?`)) {
         try {
-          await axios.delete(`http://localhost:5000/api/herbs/${id}`);
+          await axios.delete(`http://localhost:5001/api/herbs/${id}`);
           setHerbs((prevHerbs) => prevHerbs.filter((h) => h._id !== id));
           showNotification(`${herb.name} has been deleted.`, "bg-red-600");
         } catch (error) {
@@ -59,7 +59,7 @@ const ManageContent = () => {
     if (herb) {
       try {
         const newStatus = !herb.isActive;
-        await axios.put(`http://localhost:5000/api/herbs/status/${id}`, {
+        await axios.put(`http://localhost:5001/api/herbs/status/${id}`, {
           isActive: newStatus
         });
         

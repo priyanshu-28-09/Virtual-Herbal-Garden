@@ -15,7 +15,7 @@ const Auth = () => {
           return;
         }
   
-        const response = await fetch("http://localhost:5000/api/users/profile", {
+        const response = await fetch("http://localhost:5001/api/users/profile", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

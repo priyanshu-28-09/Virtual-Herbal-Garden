@@ -26,7 +26,7 @@ const MyHerbs = () => {
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/herbs/my-herbs/${user._id || user.id}`,
+        `http://localhost:5001/api/herbs/my-herbs/${user._id || user.id}`,
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -75,7 +75,7 @@ const MyHerbs = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/herbs/${editingId}`, {
+      const response = await fetch(`http://localhost:5001/api/herbs/${editingId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ const MyHerbs = () => {
     
     if (window.confirm(`Are you sure you want to delete "${herb.name}"?`)) {
       try {
-        const response = await fetch(`http://localhost:5000/api/herbs/${id}`, {
+        const response = await fetch(`http://localhost:5001/api/herbs/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -202,7 +202,7 @@ const MyHerbs = () => {
                 <img
                   src={
                     herb.image
-                      ? `http://localhost:5000${herb.image}`
+                      ? `http://localhost:5001${herb.image}`
                       : "https://via.placeholder.com/300x200?text=No+Image"
                   }
                   alt={herb.name}
@@ -282,7 +282,7 @@ const MyHerbs = () => {
               return (
                 <>
                   <img
-                    src={herb.image ? `http://localhost:5000${herb.image}` : "https://via.placeholder.com/600x300"}
+                    src={herb.image ? `http://localhost:5001${herb.image}` : "https://via.placeholder.com/600x300"}
                     alt={herb.name}
                     className="w-full h-64 object-cover rounded-md"
                   />
@@ -306,7 +306,7 @@ const MyHerbs = () => {
                     <div className="mt-6">
                       <h4 className="text-xl font-semibold mb-2">Video:</h4>
                       <video controls className="w-full rounded-md">
-                        <source src={`http://localhost:5000${herb.video}`} type="video/mp4" />
+                        <source src={`http://localhost:5001${herb.video}`} type="video/mp4" />
                         Your browser does not support the video tag.
                       </video>
                     </div>

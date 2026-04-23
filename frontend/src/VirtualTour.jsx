@@ -135,7 +135,7 @@ const VirtualTour = () => {
   useEffect(() => {
     const fetchPlantData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/herbs");
+        const res = await fetch("http://localhost:5001/api/herbs");
         const data = await res.json();
         setPlants(data);
       } catch (err) {

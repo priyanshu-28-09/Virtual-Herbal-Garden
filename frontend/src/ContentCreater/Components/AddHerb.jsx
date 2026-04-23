@@ -82,9 +82,9 @@ const AddHerb = () => {
       }
 
       // API call
-      console.log('📡 Sending request to: http://localhost:5000/api/herbs');
+      console.log('📡 Sending request to: http://localhost:5001/api/herbs');
       
-      const response = await fetch('http://localhost:5000/api/herbs', {
+      const response = await fetch('http://localhost:5001/api/herbs', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

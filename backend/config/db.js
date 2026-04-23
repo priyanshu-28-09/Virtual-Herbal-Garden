@@ -19,3 +19,6 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
+
+
+// mongodb+srv://priyanshuvishwakarma3133_db_user:<db_password>@cluster0.xqb5bsx.mongodb.net/?appName=Cluster0cd bac
