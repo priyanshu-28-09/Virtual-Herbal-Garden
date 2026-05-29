@@ -100,12 +100,13 @@ exports.getHerb = async (req, res) => {
       if (!herb) {
         return res.status(404).json({ 
           success: false,
-          message: "Herb not found" 
+          message: "Herb not found",
+          herbs: []
         });
       }
       return res.status(200).json({ 
         success: true,
-        herb 
+        herbs: [herb]
       });
     } else {
       const herbs = await Herb.find().sort({ createdAt: -1 });
@@ -113,11 +114,7 @@ exports.getHerb = async (req, res) => {
     }
   } catch (error) {
     console.error('Error fetching herbs:', error);
-    res.status(500).json({ 
-      success: false,
-      message: "Server error",
-      error: error.message 
-    });
+    res.status(500).json([]);
   }
 };
 

@@ -18,38 +18,54 @@ const Bookmarks = () => {
       try {
         setLoading(true);
         
-        // ✅ FIX 1: Get token from localStorage
+        // ✅ Get token from localStorage
         const token = localStorage.getItem('token');
         
-        if (!user || !user.bookmarks || user.bookmarks.length === 0) {
-          console.log("No bookmarks found for user");
+        if (!token) {
+          console.log("No token found, cannot fetch bookmarks");
           setBookmarkedPlants([]);
           setLoading(false);
           return;
         }
 
-        console.log("Fetching bookmarks for IDs:", user.bookmarks);
-
-        // ✅ FIX 2: Correct API endpoint - should be /api/herbs not /api/herbb
-        const response = await axios.get("http://localhost:5001/api/herbs/bookmarks", {
-          params: { ids: user.bookmarks.join(',') },
+        // Step 1: Get bookmark IDs
+        const bookmarkResponse = await axios.get("http://localhost:5001/api/users/getbookmark", {
           headers: { 
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
 
-        console.log("Fetched bookmarked plants:", response.data);
-        setBookmarkedPlants(response.data);
+        const bookmarkIds = Array.isArray(bookmarkResponse.data) ? bookmarkResponse.data : [];
+        console.log("Bookmark IDs:", bookmarkIds);
+
+        if (bookmarkIds.length === 0) {
+          setBookmarkedPlants([]);
+          setLoading(false);
+          return;
+        }
+
+        // Step 2: Fetch all herbs
+        const herbsResponse = await axios.get("http://localhost:5001/api/herbs");
+        const allHerbs = Array.isArray(herbsResponse.data) ? herbsResponse.data : [];
+        
+        // Step 3: Filter herbs by bookmark IDs
+        const bookmarkedHerbs = allHerbs.filter(herb => 
+          bookmarkIds.includes(herb._id)
+        );
+
+        console.log("Fetched bookmarked plants:", bookmarkedHerbs);
+        setBookmarkedPlants(bookmarkedHerbs);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching bookmarked plants:", error);
         console.error("Error details:", error.response?.data);
+        setBookmarkedPlants([]);
         setLoading(false);
       }
     };
 
-    if (user) {
+    if (user && user._id) {
       fetchBookmarks();
     }
   }, [user]);

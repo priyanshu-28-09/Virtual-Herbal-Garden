@@ -47,20 +47,20 @@ const upload = multer({
 });
 
 // Routes
-router.post("/herbs", authenticateUser, isContentCreator, upload.fields([
+router.post("/", authenticateUser, isContentCreator, upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'video', maxCount: 1 }
 ]), createHerb);
 
-router.get("/herbs", getHerb);
-router.get("/herbs/my-herbs/:userId", authenticateUser, getMyHerbs);
-router.get("/herbs/:herbId", getHerb);
-router.put("/herbs/:herbId", authenticateUser, isContentCreator, upload.fields([
+router.get("/", getHerb);
+router.get("/my-herbs/:userId", authenticateUser, getMyHerbs);
+router.get("/:herbId", getHerb);
+router.put("/:herbId", authenticateUser, isContentCreator, upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'video', maxCount: 1 }
 ]), updateHerb);
-router.put("/herbs/status/:herbId", authenticateUser, isAdmin, updateHerbStatus);
-router.delete("/herbs/:herbId", authenticateUser, isAdmin, deleteHerb);
+router.put("/status/:herbId", authenticateUser, isAdmin, updateHerbStatus);
+router.delete("/:herbId", authenticateUser, isAdmin, deleteHerb);
 router.get('/herbb', herbb);
 
 module.exports = router;

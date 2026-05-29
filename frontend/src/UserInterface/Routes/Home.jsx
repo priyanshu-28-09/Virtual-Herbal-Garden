@@ -19,8 +19,14 @@ const Home = ({ addBookmark }) => {
   useEffect(() => {
     axios
       .get("http://localhost:5001/api/herbs")
-      .then((res) => setPlants(res.data))
-      .catch((err) => console.error("Error fetching plants:", err));
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setPlants(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching plants:", err);
+        setPlants([]);
+      });
   }, []);
 
   useEffect(() => {

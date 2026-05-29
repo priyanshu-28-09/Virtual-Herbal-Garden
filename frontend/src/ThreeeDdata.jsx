@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 
 const ThreeeDdata = () => {
   // Plant data
@@ -243,10 +244,23 @@ const ThreeeDdata = () => {
    
 
   return (
-    <div>
-      
-    </div>
-  );
+  <div>
+    <h1>🌿 Virtual Herbal Garden</h1>
+
+    {plants.length === 0 ? (
+      <p>No plants available</p>
+    ) : (
+      plants.map((plant) => (
+        <div key={plant.id} style={{ border: "1px solid gray", margin: "10px", padding: "10px" }}>
+          <h2>{plant.name}</h2>
+          <img src={plant.image} alt={plant.name} width="150" />
+          <p>{plant.description}</p>
+        </div>
+      ))
+    )}
+  </div>
+);
 };
 
 export default ThreeeDdata;
+

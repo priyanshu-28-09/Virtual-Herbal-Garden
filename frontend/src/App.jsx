@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom
 import { useAuth } from "./AuthContext";
 import ManageContent from "./AdminDashboard/ManageContent";
 
+//for 3d
+import ThreeeDdata from "./ThreeeDdata";
+
 import Navbar from "./UserInterface/Components/Navbar";
 import Navigation from "./AdminDashboard/components/Navigation";
 import Footer from "./UserInterface/Components/Footer";

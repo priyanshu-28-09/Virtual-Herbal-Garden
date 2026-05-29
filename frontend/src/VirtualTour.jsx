@@ -137,9 +137,11 @@ const VirtualTour = () => {
       try {
         const res = await fetch("http://localhost:5001/api/herbs");
         const data = await res.json();
-        setPlants(data);
+        const herbsArray = Array.isArray(data) ? data : [];
+        setPlants(herbsArray);
       } catch (err) {
         console.error("Error:", err);
+        setPlants([]);
       } finally {
         setLoading(false);
       }
