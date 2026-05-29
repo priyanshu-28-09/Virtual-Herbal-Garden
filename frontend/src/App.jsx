@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "./AuthContext";
-import ManageContent from "./AdminDashboard/ManageContent";
 
-//for 3d
-import ThreeeDdata from "./ThreeeDdata";
+import AuthProvider, { useAuth } from "./AuthContext";
+import ProtectedRoute from "./ProtectedRoute";
+import ErrorBoundary from "./ErrorBoundary";
 
 import Navbar from "./UserInterface/Components/Navbar";
-import Navigation from "./AdminDashboard/components/Navigation";
 import Footer from "./UserInterface/Components/Footer";
+
 import Login from "./UserInterface/Routes/LoginPages/Login";
 import Register from "./UserInterface/Routes/LoginPages/Register";
 import Reset from "./UserInterface/Routes/LoginPages/Reset";
+import Chatbot from "./UserInterface/Routes/LoginPages/Chatbot";
+
+import LandingPage from "./UserInterface/Routes/LandingPage";
 import Home from "./UserInterface/Routes/Home";
 import About from "./UserInterface/Routes/About";
 import VirtualTour from "./VirtualTour";
@@ -20,20 +22,18 @@ import Bookmarks from "./UserInterface/Routes/Bookmarks";
 import UserProfile from "./UserInterface/Routes/UserProfile";
 import Setting from "./UserInterface/Routes/Setting";
 import Logout from "./UserInterface/Routes/Logout";
+
 import AdminDashboard from "./AdminDashboard/AdminPages/Dashboard";
 import AdminUsers from "./AdminDashboard/AdminPages/Users";
 import AdminLogs from "./AdminDashboard/AdminPages/Logs";
-import ContentCreatorDashboard from "./ContentCreater/Components/ContentCreatorDashboard"; 
-import ContentCreatorProfile from "./ContentCreater/Components/Profile"; 
-import ContentCreatorSidebar from "./ContentCreater/Components/sidebar"; 
-import ContentCreatorMyherbs from "./ContentCreater/Components/MyHerbs"; 
-import ContentCreatorAddherbs from "./ContentCreater/Components/AddHerb"; 
-import ProtectedRoute from "./ProtectedRoute";
-import AuthProvider from "./AuthContext";
-import ErrorBoundary from "./ErrorBoundary";
-import LandingPage from "./UserInterface/Routes/LandingPage.jsx";
-import Chatbot from "./UserInterface/Routes/LoginPages/Chatbot";
+import ManageContent from "./AdminDashboard/ManageContent";
+import Navigation from "./AdminDashboard/components/Navigation";
 
+import ContentCreatorDashboard from "./ContentCreater/Components/ContentCreatorDashboard";
+import ContentCreatorProfile from "./ContentCreater/Components/Profile";
+import ContentCreatorSidebar from "./ContentCreater/Components/sidebar";
+import ContentCreatorMyherbs from "./ContentCreater/Components/MyHerbs";
+import ContentCreatorAddherbs from "./ContentCreater/Components/AddHerb";
 // NotFound Component
 const NotFound = () => (
   <div className="min-h-screen flex items-center justify-center">

@@ -35,11 +35,14 @@ useEffect(() => {
     fetchCounts();
 }, []);
   return (
-    <div className="p-6  min-h-screen bg-gray-100">
+    <div className="p-8 min-h-screen bg-gradient-to-br from-white to-[#E6FFF5] dark:from-[#0F1720] dark:to-[#0a1f15]">
       {/* <Navbar /> */}
-      <p className="text-2xl pb-3 font-semibold font-serif">Dashboard</p>
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-2">Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400 text-lg">Overview of your herbal garden platform</p>
+      </div>
       {/* Overview Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <OverviewCard title="Total Users" value={counts.users} icon="👤" />
         <OverviewCard title="Total Herbs" value={plant.length} icon="🌿" />
         <OverviewCard title="Content Creator" value={counts.contentCreators} icon="📄" />
@@ -47,8 +50,8 @@ useEffect(() => {
       </div>
 
       {/* Recent Activities */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Recent User Activity</h2>
+      <div className="mb-6 bg-white dark:bg-[#0F1720] rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-800">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Recent User Activity</h2>
         <RecentActivityTable />
       </div>
     </div>

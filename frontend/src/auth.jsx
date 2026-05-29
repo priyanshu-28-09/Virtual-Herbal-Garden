@@ -1,5 +1,4 @@
-import { response } from 'express';
-import React , { useState, useEffect }from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Auth = () => {
     const [user, setUser] = useState(""); // State for storing user data
@@ -45,4 +44,4 @@ const Auth = () => {
     );
 }
 
-export default auth;
+export default Auth;

@@ -29,18 +29,18 @@ const Sidebar = () => {
 
   return (
     <>
-      <div className="sidebar fixed w-64 bg-emerald-600 text-white h-screen flex flex-col p-5 font-bold">
+      <div className="sidebar fixed w-64 bg-gradient-to-b from-[#2ECC71] to-[#1ea85a] text-white h-screen flex flex-col p-6 font-semibold z-40 shadow-xl">
         {/* Title */}
-        <h2 className="text-xl mb-6">Content Creator</h2>
+        <h2 className="text-2xl font-bold mb-8 text-white drop-shadow-md">Content Creator</h2>
         
         {/* Navigation Links */}
-        <nav className="flex flex-col gap-6">
+        <nav className="flex flex-col gap-3 flex-grow">
           <NavLink
             to="/content-creator/dashboard"
             className={({ isActive }) =>
               isActive
-                ? "text-green-200 underline"
-                : "text-white hover:text-green-300"
+                ? "px-4 py-3 bg-white/20 rounded-lg text-white border-l-4 border-white transition-all"
+                : "px-4 py-3 text-white/90 hover:bg-white/10 rounded-lg transition-all hover:text-white"
             }
           >
             Dashboard
@@ -49,8 +49,8 @@ const Sidebar = () => {
             to="/content-creator/add-herb"
             className={({ isActive }) =>
               isActive
-                ? "text-green-200 underline"
-                : "text-white hover:text-green-300"
+                ? "px-4 py-3 bg-white/20 rounded-lg text-white border-l-4 border-white transition-all"
+                : "px-4 py-3 text-white/90 hover:bg-white/10 rounded-lg transition-all hover:text-white"
             }
           >
             Add Herb
@@ -59,8 +59,8 @@ const Sidebar = () => {
             to="/content-creator/my-herbs"
             className={({ isActive }) =>
               isActive
-                ? "text-green-200 underline"
-                : "text-white hover:text-green-300"
+                ? "px-4 py-3 bg-white/20 rounded-lg text-white border-l-4 border-white transition-all"
+                : "px-4 py-3 text-white/90 hover:bg-white/10 rounded-lg transition-all hover:text-white"
             }
           >
             My Herbs
@@ -69,8 +69,8 @@ const Sidebar = () => {
             to="/content-creator/profile"
             className={({ isActive }) =>
               isActive
-                ? "text-green-200 underline"
-                : "text-white hover:text-green-300"
+                ? "px-4 py-3 bg-white/20 rounded-lg text-white border-l-4 border-white transition-all"
+                : "px-4 py-3 text-white/90 hover:bg-white/10 rounded-lg transition-all hover:text-white"
             }
           >
             Profile
@@ -79,7 +79,7 @@ const Sidebar = () => {
           {/* Logout Button */}
           <button
             onClick={handleLogoutClick}
-            className="bg-red-600 text-white py-2 mt-4 rounded-md hover:bg-red-700 w-full transition-colors"
+            className="bg-red-500/90 text-white py-3 mt-auto rounded-lg hover:bg-red-600 hover:shadow-lg w-full transition-all font-semibold"
           >
             Logout
           </button>

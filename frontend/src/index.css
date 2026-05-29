@@ -2,48 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-#img {
-  -webkit-overflow-scrolling: hidden;
-}
-
 @font-face {
   font-family: t1;
-  src: url(./assets/file1.woff2);
+  src: url("./assets/file1.woff2");
 }
 
 @font-face {
   font-family: t2;
-  src: url(./assets/file2.woff2);
+  src: url("./assets/file2.woff2");
 }
 
 @font-face {
   font-family: t3;
-  src: url(./assets/file3.woff2);
+  src: url("./assets/file3.woff2");
 }
 
 @font-face {
   font-family: t4;
-  src: url(./assets/file4.woff2);
+  src: url("./assets/file4.woff2");
 }
 
 @font-face {
   font-family: t5;
-  src: url(./assets/file5.woff2);
+  src: url("./assets/file5.woff2");
 }
 
 @font-face {
   font-family: t6;
-  src: url(./assets/file6.woff2);
+  src: url("./assets/file6.woff2");
 }
 
-/* Hide scrollbars for specific sections */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: #f7fff9;
+  color: #1f2937;
+  font-family: Arial, sans-serif;
+}
+
+#img {
+  -webkit-overflow-scrolling: touch;
+}
+
 .story::-webkit-scrollbar,
 .card::-webkit-scrollbar {
-  display: none; /* Hide the scrollbar for webkit browsers */
+  display: none;
 }
 
 .story,
 .card {
-  -ms-overflow-style: none; /* Hide the scrollbar for IE and Edge */
-  scrollbar-width: none; /* Hide the scrollbar for Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

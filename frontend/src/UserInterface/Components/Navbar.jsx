@@ -40,30 +40,30 @@ const Navbar = () => {
 
   return (
     <>
-      <div className={`flex justify-between items-center px-6 md:px-20 py-4 transition-all duration-300 ease-in-out bg-emerald-600 shadow-lg rounded-md sticky top-0 z-50`}>
-        <div className="text-white text-2xl font-medium font-serif">
+      <div className={`flex justify-between items-center px-6 md:px-20 py-4 transition-all duration-300 ease-in-out bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] shadow-lg rounded-b-2xl sticky top-0 z-50`}>
+        <div className="text-white text-2xl font-bold drop-shadow-md">
           <h1>AYUSH Virtual</h1>
           <h1>Herbal Garden</h1>
         </div>
 
         <div className="md:hidden">
-          <button className="text-white text-3xl focus:outline-none" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button className="text-white text-3xl focus:outline-none hover:scale-110 transition-transform" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             ☰
           </button>
         </div>
     
-        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:flex items-center space-y-6 md:space-y-0 md:space-x-6 absolute md:static top-16 left-0 w-full md:w-auto bg-[#252725] md:bg-transparent z-10 p-4 md:p-0 ml-[500px]`}>
+        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:flex items-center space-y-6 md:space-y-0 md:space-x-6 absolute md:static top-16 left-0 w-full md:w-auto bg-[#1a4d2e] md:bg-transparent z-10 p-4 md:p-0 ml-[500px] rounded-b-lg md:rounded-b-none`}>
           <ul className="flex flex-col md:flex-row md:space-x-6 text-white">
-            <Link to="/home"><li className="rounded-full bg-gray-900 bg-opacity-40 px-4 py-2 cursor-pointer">Home</li></Link>
-            <Link to="/home/about"><li className="rounded-full bg-gray-900 bg-opacity-40 px-4 py-2 cursor-pointer">About</li></Link>
-            <Link to="/home/virtualTour"><li className="rounded-full bg-gray-900 bg-opacity-40 px-4 py-2 cursor-pointer">Virtual Tour</li></Link>
+            <Link to="/home"><li className="rounded-lg bg-white/20 px-4 py-2 cursor-pointer hover:bg-white/30 transition-all">Home</li></Link>
+            <Link to="/home/about"><li className="rounded-lg bg-white/20 px-4 py-2 cursor-pointer hover:bg-white/30 transition-all">About</li></Link>
+            <Link to="/home/virtualTour"><li className="rounded-lg bg-white/20 px-4 py-2 cursor-pointer hover:bg-white/30 transition-all">Virtual Tour</li></Link>
           </ul>
         </div>
 
-        <div className="flex items-center space-x-14">
+        <div className="flex items-center space-x-6">
           {isAuthenticated && (
             <button 
-              className="bg-red-600 py-2 px-4 rounded-full bg-opacity-100 hover:bg-red-700 transition-colors font-semibold" 
+              className="bg-red-500 py-2 px-6 rounded-lg bg-opacity-100 hover:bg-red-600 transition-all hover:shadow-lg font-semibold text-white" 
               onClick={handleLogoutClick}
             >
               Logout
@@ -72,21 +72,21 @@ const Navbar = () => {
 
           <div className="relative">
             <button
-              className="text-white text-3xl focus:outline-none"
+              className="text-white text-3xl focus:outline-none hover:scale-110 transition-transform"
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
             >
               <FaUserCircle />
             </button>
             {isProfileMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2">
-                <Link to="/home/bookmarks" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-black transition duration-200 ease-in-out">
-                  Bookmarks
+              <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-[#0F1720] shadow-2xl rounded-xl py-2 border border-gray-200 dark:border-gray-700">
+                <Link to="/home/bookmarks" className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-[#E6FFF5] dark:hover:bg-[#1a2f24] transition-all hover:text-[#2ECC71] font-semibold rounded-lg">
+                  🔖 Bookmarks
                 </Link>
-                <Link to="/home/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-black transition duration-200 ease-in-out">
-                  Profile
+                <Link to="/home/profile" className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-[#E6FFF5] dark:hover:bg-[#1a2f24] transition-all hover:text-[#2ECC71] font-semibold rounded-lg">
+                  👤 Profile
                 </Link>
-                <Link to="/home/setting" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-black transition duration-200 ease-in-out">
-                  Settings
+                <Link to="/home/setting" className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-[#E6FFF5] dark:hover:bg-[#1a2f24] transition-all hover:text-[#2ECC71] font-semibold rounded-lg">
+                  ⚙️ Settings
                 </Link>
               </div>
             )}

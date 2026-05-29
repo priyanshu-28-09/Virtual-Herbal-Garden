@@ -44,19 +44,19 @@ const Profile = () => {
   };
 
   return (
-    <div className=" Profile flex justify-center items-center h-screen bg-gray-100 overflow-auto">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-auto transition-transform">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#E6FFF5] to-[#B8F6D1] dark:from-[#0F1720] dark:to-[#153726] p-4 overflow-auto">
+      <div className="bg-white dark:bg-[#0F1720] p-8 rounded-2xl shadow-lg w-full max-w-lg max-h-[90vh] overflow-auto transition-all border border-gray-200 dark:border-gray-800">
         <div className="mb-8 text-center">
           <div className="relative mb-4">
             <img
               src={profileImage || profile.profilePicture || "https://via.placeholder.com/200"}
               alt="Profile"
-              className="w-36 h-36 rounded-full object-cover border-4 border-blue-500"
+              className="w-36 h-36 rounded-full object-cover border-4 border-[#2ECC71]"
             />
-            <button className="absolute bottom-3 right-3 bg-blue-500 text-white px-3 py-2 rounded-md flex items-center">
+            <button className="absolute bottom-3 right-3 bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white px-3 py-2 rounded-lg flex items-center hover:shadow-lg transition-all hover:scale-105">
               <label htmlFor="file-upload" className="cursor-pointer flex items-center">
                 <FaCamera className="mr-2" />
-                Change Picture
+                Change
               </label>
               <input
                 type="file"
@@ -68,39 +68,46 @@ const Profile = () => {
           </div>
           <div>
             {isEditing ? (
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Edit Your Profile</h2>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-2">Edit Profile</h2>
             ) : isNewProfile ? (
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Create Your Profile</h2>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-2">Create Profile</h2>
             ) : (
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">{profile.name || "Your Name"}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{profile.name || "Your Name"}</h2>
             )}
-            <p className="text-sm text-blue-500 mb-4">@{profile.username || "Username"}</p>
-            <p className="text-sm text-gray-600 italic mb-6">{profile.bio || "Tell us about yourself..."}</p>
+            <p className="text-sm text-[#2ECC71] font-semibold mb-4">@{profile.username || "Username"}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 italic mb-6">{profile.bio || "Tell us about yourself..."}</p>
           </div>
         </div>
 
         {isEditing || isNewProfile ? (
           <div className="text-left mt-8">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Profile Information</h3>
-            <form onSubmit={handleFormSubmit}>
-              <label className="block text-sm text-gray-600 mb-2">Name:</label>
-              <input
-                type="text"
-                name="name"
-                value={profile.name}
-                onChange={handleInputChange}
-                className="w-full p-3 mb-4 border rounded-lg border-gray-300 text-lg"
-                placeholder="Enter your full name"
-              />
-              <label className="block text-sm text-gray-600 mb-2">Username:</label>
-              <input
-                type="text"
-                name="username"
-                value={profile.username}
-                onChange={handleInputChange}
-                className="w-full p-3 mb-4 border rounded-lg border-gray-300 text-lg"
-                placeholder="Enter your username"
-              />
+            <h3 className="text-xl font-bold bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-4">Profile Information</h3>
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Name:</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={profile.name}
+                  onChange={handleInputChange}
+                  className="w-full p-3 mb-4 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-lg focus:outline-none focus:ring-2 focus:ring-[#2ECC71] transition-all"
+                  placeholder="Enter your full name"
+                />
+              </div>
+             <div>
+  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+    Username:
+  </label>
+
+  <input
+    type="text"
+    name="username"
+    value={profile.username}
+    onChange={handleInputChange}
+    className="w-full p-3 mb-4 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-lg focus:outline-none focus:ring-2 focus:ring-[#2ECC71]"
+    placeholder="Enter your username"
+  />
+</div>
               <label className="block text-sm text-gray-600 mb-2">Bio:</label>
               <textarea
                 name="bio"

@@ -158,18 +158,19 @@ const AddHerb = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-10 mb-10">
-      <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-        Add New Herb to AYUSH Virtual Garden
+    <div className="max-w-5xl mx-auto bg-white dark:bg-[#0F1720] shadow-2xl rounded-2xl p-8 mt-10 mb-10 border border-gray-200 dark:border-gray-800">
+      <h2 className="text-4xl font-bold bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-2 text-center">
+        🌱 Add New Herb
       </h2>
+      <p className="text-center text-gray-600 dark:text-gray-400 mb-8">Share your herbal knowledge with the community</p>
 
       {/* Success/Error Message */}
       {message.text && (
         <div
-          className={`mb-6 p-4 rounded-lg ${
+          className={`mb-6 p-4 rounded-lg font-semibold transition-all ${
             message.type === 'success'
-              ? 'bg-green-100 text-green-800 border border-green-300'
-              : 'bg-red-100 text-red-800 border border-red-300'
+              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-400 dark:border-green-600'
+              : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-400 dark:border-red-600'
           }`}
         >
           {message.text}
@@ -179,15 +180,15 @@ const AddHerb = () => {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information Section */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Basic Information</h3>
+        <div className="bg-gradient-to-br from-[#E6FFF5] to-[#F0FFFA] dark:from-[#1a2f24] dark:to-[#0F1720] p-6 rounded-2xl border-2 border-[#2ECC71]/20">
+          <h3 className="text-2xl font-bold text-[#2ECC71] mb-6 flex items-center gap-2">📋 Basic Information</h3>
           
           <div className="space-y-4">
             {['name', 'scientificName', 'description'].map((key) => (
               <div key={key}>
                 <label
                   htmlFor={key}
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
                 >
                   {fieldLabels[key]}<span className="text-red-500">*</span>
                 </label>
@@ -198,7 +199,7 @@ const AddHerb = () => {
                   placeholder={`Enter ${fieldLabels[key].toLowerCase()}`}
                   required
                   rows={key === 'description' ? 4 : 2}
-                  className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="mt-1 block w-full p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-[#2ECC71] focus:border-[#2ECC71] sm:text-sm transition-all"
                 />
               </div>
             ))}
@@ -206,15 +207,15 @@ const AddHerb = () => {
         </div>
 
         {/* Botanical & Physical Information */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Botanical & Physical Information</h3>
+        <div className="bg-gradient-to-br from-[#E6FFF5] to-[#F0FFFA] dark:from-[#1a2f24] dark:to-[#0F1720] p-6 rounded-2xl border-2 border-[#2ECC71]/20">
+          <h3 className="text-2xl font-bold text-[#2ECC71] mb-6 flex items-center gap-2">🌱 Botanical Information</h3>
           
           <div className="space-y-4">
             {['botanicalInfo', 'physicalDescription', 'habitat'].map((key) => (
               <div key={key}>
                 <label
                   htmlFor={key}
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
                 >
                   {fieldLabels[key]}<span className="text-red-500">*</span>
                 </label>
@@ -225,7 +226,7 @@ const AddHerb = () => {
                   placeholder={`Enter ${fieldLabels[key].toLowerCase()}`}
                   required
                   rows={3}
-                  className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="mt-1 block w-full p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-[#2ECC71] focus:border-[#2ECC71] sm:text-sm transition-all"
                 />
               </div>
             ))}
@@ -233,15 +234,15 @@ const AddHerb = () => {
         </div>
 
         {/* Medicinal & Chemical Information */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Medicinal & Chemical Information</h3>
+        <div className="bg-gradient-to-br from-[#E6FFF5] to-[#F0FFFA] dark:from-[#1a2f24] dark:to-[#0F1720] p-6 rounded-2xl border-2 border-[#2ECC71]/20">
+          <h3 className="text-2xl font-bold text-[#2ECC71] mb-6 flex items-center gap-2">💊 Medicinal Information</h3>
           
           <div className="space-y-4">
             {['medicinalMethod', 'conventionalComposition', 'chemicalComposition', 'pharmacologicalEffect'].map((key) => (
               <div key={key}>
                 <label
                   htmlFor={key}
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
                 >
                   {fieldLabels[key]}<span className="text-red-500">*</span>
                 </label>
@@ -252,7 +253,7 @@ const AddHerb = () => {
                   placeholder={`Enter ${fieldLabels[key].toLowerCase()}`}
                   required
                   rows={3}
-                  className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="mt-1 block w-full p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-[#2ECC71] focus:border-[#2ECC71] sm:text-sm transition-all"
                 />
               </div>
             ))}
@@ -260,15 +261,15 @@ const AddHerb = () => {
         </div>
 
         {/* Clinical & Safety Information */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Clinical & Safety Information</h3>
+        <div className="bg-gradient-to-br from-[#E6FFF5] to-[#F0FFFA] dark:from-[#1a2f24] dark:to-[#0F1720] p-6 rounded-2xl border-2 border-[#2ECC71]/20">
+          <h3 className="text-2xl font-bold text-[#2ECC71] mb-6 flex items-center gap-2">⚠️ Safety Information</h3>
           
           <div className="space-y-4">
             {['clinicalStudies', 'safetyPrecautions'].map((key) => (
               <div key={key}>
                 <label
                   htmlFor={key}
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
                 >
                   {fieldLabels[key]}<span className="text-red-500">*</span>
                 </label>
@@ -279,7 +280,7 @@ const AddHerb = () => {
                   placeholder={`Enter ${fieldLabels[key].toLowerCase()}`}
                   required
                   rows={3}
-                  className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="mt-1 block w-full p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-[#2ECC71] focus:border-[#2ECC71] sm:text-sm transition-all"
                 />
               </div>
             ))}
@@ -287,15 +288,15 @@ const AddHerb = () => {
         </div>
 
         {/* Cultural & Additional Information */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Cultural & Additional Information</h3>
+        <div className="bg-gradient-to-br from-[#E6FFF5] to-[#F0FFFA] dark:from-[#1a2f24] dark:to-[#0F1720] p-6 rounded-2xl border-2 border-[#2ECC71]/20">
+          <h3 className="text-2xl font-bold text-[#2ECC71] mb-6 flex items-center gap-2">🌿 Additional Info</h3>
           
           <div className="space-y-4">
             {['culturalSignificance', 'plantSuccess', 'referenceLink', '_3DId'].map((key) => (
               <div key={key}>
                 <label
                   htmlFor={key}
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
                 >
                   {fieldLabels[key]}<span className="text-red-500">*</span>
                 </label>
@@ -307,7 +308,7 @@ const AddHerb = () => {
                     onChange={handleChange}
                     placeholder="https://example.com/herb-reference"
                     required
-                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    className="mt-1 block w-full p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-[#2ECC71] focus:border-[#2ECC71] sm:text-sm transition-all"
                   />
                 ) : key === '_3DId' ? (
                   <input
@@ -317,7 +318,7 @@ const AddHerb = () => {
                     onChange={handleChange}
                     placeholder="Enter 3D model ID or URL"
                     required
-                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    className="mt-1 block w-full p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-[#2ECC71] focus:border-[#2ECC71] sm:text-sm transition-all"
                   />
                 ) : (
                   <textarea
@@ -327,7 +328,7 @@ const AddHerb = () => {
                     placeholder={`Enter ${fieldLabels[key].toLowerCase()}`}
                     required
                     rows={3}
-                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    className="mt-1 block w-full p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-[#2ECC71] focus:border-[#2ECC71] sm:text-sm transition-all"
                   />
                 )}
               </div>
@@ -336,11 +337,11 @@ const AddHerb = () => {
         </div>
 
         {/* Upload Image */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Herb Image</h3>
+        <div className="bg-gradient-to-br from-[#E6FFF5] to-[#F0FFFA] dark:from-[#1a2f24] dark:to-[#0F1720] p-6 rounded-2xl border-2 border-[#2ECC71]/20">
+          <h3 className="text-2xl font-bold text-[#2ECC71] mb-6 flex items-center gap-2">📸 Herb Image</h3>
           
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="image" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Upload Herb Image<span className="text-red-500">*</span>
             </label>
             <input
@@ -349,13 +350,13 @@ const AddHerb = () => {
               accept="image/*"
               onChange={handleImageChange}
               required
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+              className="mt-1 block w-full p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-[#2ECC71] focus:border-[#2ECC71] sm:text-sm transition-all cursor-pointer hover:bg-white/50 dark:hover:bg-gray-600/50"
             />
             {imagePreview && (
               <img
                 src={imagePreview}
                 alt="Herb Preview"
-                className="mt-4 w-full max-h-64 object-cover rounded-md"
+                className="mt-4 w-full max-h-64 object-cover rounded-2xl border-2 border-[#2ECC71]/30 shadow-lg"
               />
             )}
           </div>
@@ -365,13 +366,13 @@ const AddHerb = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-3 px-4 font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
+          className={`w-full py-4 px-6 font-bold rounded-xl shadow-lg focus:outline-none focus:ring-2 focus:ring-[#2ECC71] focus:ring-offset-2 transition-all text-lg ${
             loading
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-green-600 text-white hover:bg-green-700'
+              ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed text-gray-600'
+              : 'bg-gradient-to-r from-[#2ECC71] to-[#58E07A] text-white hover:shadow-2xl hover:scale-105 active:scale-95'
           }`}
         >
-          {loading ? '⏳ Adding Herb...' : 'Add Herb to Virtual Garden'}
+          {loading ? '⏳ Adding Herb...' : '🌱 Add Herb to Virtual Garden'}
         </button>
       </form>
     </div>

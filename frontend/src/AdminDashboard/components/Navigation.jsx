@@ -29,47 +29,39 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 h-full w-64 bg-green-600 text-white p-6 z-40">
-        <h1 className="text-lg font-bold mb-6 pt-4">Admin Dashboard</h1>
-        <ul className="space-y-4">
+      <nav className="fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#2ECC71] to-[#1ea85a] text-white p-6 z-40 shadow-2xl">
+        <h1 className="text-2xl font-bold mb-8 text-white drop-shadow-md">Admin Dashboard</h1>
+        <ul className="space-y-3 flex flex-col gap-2">
           <li>
             <Link
               to="/admin/dashboard"
-              className="block p-2 rounded hover:bg-green-700 transition-colors"
+              className="block px-4 py-3 rounded-lg text-white/90 hover:bg-white/15 hover:text-white transition-all font-semibold"
             >
-              Dashboard
+              📊 Dashboard
             </Link>
           </li>
           <li>
             <Link
               to="/admin/users"
-              className="block p-2 rounded hover:bg-green-700 transition-colors"
+              className="block px-4 py-3 rounded-lg text-white/90 hover:bg-white/15 hover:text-white transition-all font-semibold"
             >
-              Users
+              👥 Users
             </Link>
           </li>
           <li>
             <Link
               to="/admin/manage-content"
-              className="block p-2 rounded hover:bg-green-700 transition-colors"
+              className="block px-4 py-3 rounded-lg text-white/90 hover:bg-white/15 hover:text-white transition-all font-semibold"
             >
-              Manage Content
+              📝 Manage Content
             </Link>
           </li>
-          {/* <li>
-            <Link
-              to="/admin/logs"
-              className="block p-2 rounded hover:bg-green-700 transition-colors"
-            >
-              Logs
-            </Link>
-          </li> */}
         </ul>
 
         {/* Logout Button */}
         <div className="mt-auto absolute bottom-6 left-6 right-6">
           <button
-            className="w-full px-4 py-2 bg-red-500 rounded text-white hover:bg-red-600 transition-colors font-semibold"
+            className="w-full px-4 py-3 bg-red-500/90 rounded-lg text-white hover:bg-red-600 transition-all font-semibold hover:shadow-lg"
             onClick={handleLogoutClick}
           >
             Logout
