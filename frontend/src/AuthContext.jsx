@@ -42,9 +42,16 @@ const AuthProvider = ({ children }) => {
           'Authorization': `Bearer ${token}`
         }
       });
+      if (!response.ok) {
+        const err = await response.text();
+        console.error('❌ getHerbs API error:', response.status, err);
+        setHerbs([]);
+        return;
+      }
+
       const data = await response.json();
-      setHerbs(data);
-      console.log('🌿 Herbs loaded:', data.length);
+      setHerbs(Array.isArray(data) ? data : (data.herbs || data.data || []));
+      console.log('🌿 Herbs loaded:', Array.isArray(data) ? data.length : (data.herbs ? data.herbs.length : 0));
     } catch (error) {
       console.error("❌ Error fetching herbs:", error);
     } finally {

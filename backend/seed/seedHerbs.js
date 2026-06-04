@@ -1,0 +1,153 @@
+const Herb = require('../models/herbModel');
+
+const herbSeedData = [
+  {
+    name: "Tulsi",
+    scientificName: "Ocimum sanctum",
+    description: "Tulsi is a sacred Ayurvedic herb that supports immunity, reduces stress, and soothes the respiratory system.",
+    image: "https://images.unsplash.com/photo-1518976024611-488c78e86d02?auto=format&fit=crop&w=800&q=80",
+    botanicalInfo: "A sacred herb often grown near homes for spiritual and health benefits.",
+    physicalDescription: "A small aromatic herb with green leaves and purple or green stems.",
+    habitat: "Thrives in warm, humid climates with partial sun.",
+    medicinalMethod: "Use leaves to make tea, add to soups, or prepare herbal infusions.",
+    conventionalComposition: "Contains eugenol, ursolic acid, and flavonoids.",
+    chemicalComposition: "Rich in antioxidants, tannins, and volatile oils.",
+    pharmacologicalEffect: "Adaptogenic, anti-inflammatory, and antiviral.",
+    clinicalStudies: "Studied for stress relief, immunity support, and respiratory health.",
+    safetyPrecautions: "Generally safe; avoid overuse during pregnancy without guidance.",
+    culturalSignificance: "Revered in Hindu tradition and used in daily prayers.",
+    plantSuccess: "Widely cultivated in home gardens for wellness and ritual use.",
+    referenceLink: "https://en.wikipedia.org/wiki/Ocimum_tenuiflorum",
+    _3DId: "c604e8f52c234f2e9259d895fe028819",
+    category: "Sacred Herb",
+    uses: "Immunity support, stress reduction, respiratory relief.",
+    careInstructions: "Grow in bright indirect light, water regularly, and trim weekly for fresh growth."
+  },
+  {
+    name: "Neem",
+    scientificName: "Azadirachta indica",
+    description: "Neem is a natural purifier used for skin care, oral health, and immune balance.",
+    image: "https://images.unsplash.com/photo-1611162617214-59b73e63b7ae?auto=format&fit=crop&w=800&q=80",
+    botanicalInfo: "A fast-growing evergreen tree from the mahogany family.",
+    physicalDescription: "Large tree with pinnate leaves and yellow-white flowers.",
+    habitat: "Native to hot, dry regions and tolerates a range of soil conditions.",
+    medicinalMethod: "Leaves, bark, and oil are used topically or in teas for healing.",
+    conventionalComposition: "Contains azadirachtin, nimbin, and nimbidin.",
+    chemicalComposition: "Rich in triterpenoids, flavonoids, and fatty acids.",
+    pharmacologicalEffect: "Antibacterial, antifungal, and anti-inflammatory.",
+    clinicalStudies: "Used in research for skin health and oral hygiene.",
+    safetyPrecautions: "Avoid excessive oral use; use topical products safely.",
+    culturalSignificance: "Considered a tree of life in Indian culture.",
+    plantSuccess: "Cultivated widely for medicinal, agricultural, and cosmetic use.",
+    referenceLink: "https://en.wikipedia.org/wiki/Azadirachta_indica",
+    _3DId: "03edef8009d942d3a3db6fa64cecbe56",
+    category: "Detox Tree",
+    uses: "Skin support, infection control, insect repellant.",
+    careInstructions: "Plant in full sun, provide deep soil, and water regularly during establishment."
+  },
+  {
+    name: "Aloe Vera",
+    scientificName: "Aloe barbadensis miller",
+    description: "Aloe Vera is a soothing succulent used to heal skin, support digestion, and hydrate the body.",
+    image: "https://images.unsplash.com/photo-1569041186130-0210702be11b?auto=format&fit=crop&w=800&q=80",
+    botanicalInfo: "A hardy succulent with thick leaves that hold healing gel.",
+    physicalDescription: "Rosette-forming plant with fleshy, serrated leaves.",
+    habitat: "Prefers warm, arid to semi-arid environments with bright light.",
+    medicinalMethod: "Use the inner gel externally or consume prepared aloe products safely.",
+    conventionalComposition: "Contains vitamins, minerals, and polysaccharides.",
+    chemicalComposition: "Rich in anthraquinones, amino acids, and enzymes.",
+    pharmacologicalEffect: "Wound healing, anti-inflammatory, and hydrating.",
+    clinicalStudies: "Used for burns, skin soothing, and digestive support.",
+    safetyPrecautions: "Avoid high-dose oral use without guidance; use gel topically.",
+    culturalSignificance: "Known as a healing plant in many traditional systems.",
+    plantSuccess: "Widely used for cosmetics, skincare, and home remedies.",
+    referenceLink: "https://en.wikipedia.org/wiki/Aloe_vera",
+    _3DId: "5486c62fb4f24234bf911e4e84f2c451",
+    category: "Soothing Succulent",
+    uses: "Skin healing, hydration, digestive wellness.",
+    careInstructions: "Keep in bright light, use well-draining soil, and water sparingly."
+  },
+  {
+    name: "Ashwagandha",
+    scientificName: "Withania somnifera",
+    description: "Ashwagandha is a powerful adaptogen used to calm the body, reduce stress, and improve energy.",
+    image: "https://images.unsplash.com/photo-1534269824303-cc8af11d54d8?auto=format&fit=crop&w=800&q=80",
+    botanicalInfo: "A small shrub with yellow-green flowers and red berries.",
+    physicalDescription: "Bushy plant with gray-green leaves and clusters of bell-shaped flowers.",
+    habitat: "Thrives in warm, dry climates with full sun.",
+    medicinalMethod: "Traditionally taken as powder, tea, or tincture for daily resilience.",
+    conventionalComposition: "Contains withanolides, alkaloids, and sitoindosides.",
+    chemicalComposition: "Rich in steroidal lactones and antioxidants.",
+    pharmacologicalEffect: "Stress relief, adaptogenic balance, and sleep support.",
+    clinicalStudies: "Used in research for anxiety, fatigue, and cognitive health.",
+    safetyPrecautions: "Consult a healthcare provider before long-term use.",
+    culturalSignificance: "A cornerstone herb in Ayurvedic rejuvenation formulas.",
+    plantSuccess: "Grown for its roots and rejuvenating benefits.",
+    referenceLink: "https://en.wikipedia.org/wiki/Withania_somnifera",
+    _3DId: "9a7f3d2b4c7e4a1f8b2d6c3e5f901234",
+    category: "Adaptogen",
+    uses: "Stress relief, energy support, sleep enhancement.",
+    careInstructions: "Use fertile soil, water moderately, and ensure warm daytime temperatures."
+  },
+  {
+    name: "Giloy",
+    scientificName: "Tinospora cordifolia",
+    description: "Giloy supports immune health, detoxification, and gentle cleansing of the body.",
+    image: "https://images.unsplash.com/photo-1604408054608-8e89642da910?auto=format&fit=crop&w=800&q=80",
+    botanicalInfo: "A climbing shrub with heart-shaped leaves and yellow flowers.",
+    physicalDescription: "Woody vine with twisted stems and lush green foliage.",
+    habitat: "Prefers warm climates and grows on supports or trees.",
+    medicinalMethod: "Used as juice, decoction, or powdered herb for immunity.",
+    conventionalComposition: "Contains alkaloids, glycosides, and proteins.",
+    chemicalComposition: "Rich in berberine, tinosporaside, and polysaccharides.",
+    pharmacologicalEffect: "Immune modulation, detoxification, and fever reduction.",
+    clinicalStudies: "Studied for immune support and antipyretic activity.",
+    safetyPrecautions: "Use with caution during pregnancy and autoimmune conditions.",
+    culturalSignificance: "Valued in Ayurveda as a life-supporting tonic.",
+    plantSuccess: "Grown widely for immune and wellness formulas.",
+    referenceLink: "https://en.wikipedia.org/wiki/Tinospora_cordifolia",
+    _3DId: "1f2e3d4c5b6a7980876f5e4d3c2b1a0f",
+    category: "Immune Strengthener",
+    uses: "Immunity, detox support, infection resilience.",
+    careInstructions: "Plant on a trellis or tree, water regularly, and add organic mulch."
+  },
+  {
+    name: "Amla",
+    scientificName: "Phyllanthus emblica",
+    description: "Amla is a nutrient-rich fruit herb that supports digestion, skin health, and antioxidant protection.",
+    image: "https://images.unsplash.com/photo-1601924920586-0bdc2ad4778f?auto=format&fit=crop&w=800&q=80",
+    botanicalInfo: "A small tree with bright green, tart fruit that is high in vitamin C.",
+    physicalDescription: "A tree with feathery leaves and round, greenish-yellow berries.",
+    habitat: "Grows best in warm, subtropical climates with full sun.",
+    medicinalMethod: "Fruit and extracts are used in tonics, juices, and hair oils.",
+    conventionalComposition: "Contains vitamin C, tannins, and flavonoids.",
+    chemicalComposition: "Rich in ascorbic acid, gallic acid, and polyphenols.",
+    pharmacologicalEffect: "Antioxidant, digestive, and rejuvenating.",
+    clinicalStudies: "Used in research for immunity, digestion, and skin support.",
+    safetyPrecautions: "Use moderate doses to avoid gastrointestinal discomfort.",
+    culturalSignificance: "Amla is an important fruit in Ayurvedic daily practices.",
+    plantSuccess: "Cultivated broadly for health tonics and herbal supplements.",
+    referenceLink: "https://en.wikipedia.org/wiki/Phyllanthus_emblica",
+    _3DId: "abcdef1234567890fedcba0987654321",
+    category: "Health Fruit",
+    uses: "Antioxidant support, digestion, and skin nourishment.",
+    careInstructions: "Plant in a sunny location, water deeply during dry periods, and protect young trees from frost."
+  }
+];
+
+const seedHerbs = async () => {
+  try {
+    const count = await Herb.countDocuments();
+    if (count > 0) {
+      console.log(`✅ Herb collection already contains ${count} records, skipping seed.`);
+      return;
+    }
+
+    await Herb.insertMany(herbSeedData);
+    console.log("✅ Sample herb data seeded successfully.");
+  } catch (error) {
+    console.error("❌ Seed herb data failed:", error.message);
+  }
+};
+
+module.exports = seedHerbs;

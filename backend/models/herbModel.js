@@ -16,7 +16,8 @@ const herbSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
     },
     botanicalInfo: {
       type: String,
@@ -62,13 +63,27 @@ const herbSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      required: false,
+    },
+    uses: {
+      type: String,
+      required: false,
+    },
+    careInstructions: {
+      type: String,
+      required: false,
+    },
     referenceLink: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
     },
     _3DId: {
-      type : String,
-      required: true,
+      type: String,
+      required: false,
+      default: "",
     }
   },
   {

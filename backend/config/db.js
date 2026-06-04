@@ -8,13 +8,15 @@ const connectDB = async () => {
   try {
     if (!process.env.MONGODB_URI) {
       console.warn('⚠️ MONGODB_URI not set — skipping DB connection.');
-      return;
+      return false;
     }
 
     const conn = await mongoose.connect(process.env.MONGODB_URI);
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    return true;
   } catch (error) {
     console.error(`❌ MongoDB Error: ${error.message}`);
+    return false;
   }
 };
 

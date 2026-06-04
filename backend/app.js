@@ -15,35 +15,31 @@ const app = express();
 
 // ✅ FIXED PORT (Frontend expects 5001)
 const PORT = process.env.PORT || 5001;
+const seedHerbs = require('./seed/seedHerbs');
 
-// ✅ Connect DB safely
-if (process.env.MONGODB_URI) {
-  connectDB();
-} else {
-  console.log("⚠️ MONGODB_URI not set — skipping DB connection.");
-}
+const startServer = async () => {
+  const dbConnected = await connectDB();
+
+  if (dbConnected) {
+    await seedHerbs();
+  } else {
+    console.log("⚠️ Running without MongoDB. API plant data will use fallback samples if needed.");
+  }
+
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+  });
+};
 
 // ✅ Middleware
 app.use(express.json());
 app.use(morgan('dev'));
 
-// ✅ Improved CORS
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:5175' // ✅ ADD THIS
-];
-
+// ✅ Simple CORS for local frontend
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true
+    origin: 'http://localhost:5173',
+    credentials: true,
   })
 );
 
@@ -64,6 +60,11 @@ app.use('/api/herbs', herbRoutes); // FIXED (was '/api')
 app.use('/api/categories', categoryRoutes);
 app.use('/api/reviews', reviewRoutes);
 
+// Root
+app.get('/', (req, res) => {
+  res.status(200).send('Backend is running');
+});
+
 // ❌ 404 handler (NEW)
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
@@ -80,6 +81,4 @@ app.use((err, req, res, next) => {
 });
 
 // ✅ Start server
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-});
+startServer();
