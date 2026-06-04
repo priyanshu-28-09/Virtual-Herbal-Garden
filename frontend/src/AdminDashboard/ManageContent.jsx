@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_URL } from "../api";
 
 const ManageContent = () => {
   const [herbs, setHerbs] = useState([]);
@@ -17,7 +18,7 @@ const ManageContent = () => {
   const fetchHerbs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:5001/api/herbs");
+      const response = await axios.get(`${API_URL}/herbs`);
       setHerbs(response.data);
       setLoading(false);
     } catch (error) {
@@ -42,7 +43,7 @@ const ManageContent = () => {
     if (herb) {
       if (window.confirm(`Are you sure you want to delete ${herb.name}?`)) {
         try {
-          await axios.delete(`http://localhost:5001/api/herbs/${id}`);
+          await axios.delete(`${API_URL}/herbs/${id}`);
           setHerbs((prevHerbs) => prevHerbs.filter((h) => h._id !== id));
           showNotification(`${herb.name} has been deleted.`, "bg-red-600");
         } catch (error) {
@@ -59,7 +60,7 @@ const ManageContent = () => {
     if (herb) {
       try {
         const newStatus = !herb.isActive;
-        await axios.put(`http://localhost:5001/api/herbs/status/${id}`, {
+        await axios.put(`${API_URL}/herbs/status/${id}`, {
           isActive: newStatus
         });
         

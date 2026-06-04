@@ -3,6 +3,7 @@ import OverviewCard from "../components/OverviewCard";
 import RecentActivityTable from "../components/RecentActivityTable";
 import Navbar from "../components/Navigation";
 import axios from "axios";
+import { API_URL } from "../../api";
 
 const Dashboard = () => {
   const [plant, setPlant] = useState([]);
@@ -14,7 +15,7 @@ const Dashboard = () => {
   console.log(counts);
   useEffect(() => {
     axios
-      .get("http://localhost:5001/api/herbs")
+      .get(`${API_URL}/herbs`)
       .then((res) => setPlant(res.data))
       .catch((err) => console.error("Error fetching plants:", err));
   }, []);
@@ -24,7 +25,7 @@ const Dashboard = () => {
 useEffect(() => {
     const fetchCounts = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/users/getCount');
+            const response = await fetch(`${API_URL}/users/getCount`);
             const data = await response.json();
             setCounts(data);
         } catch (error) {

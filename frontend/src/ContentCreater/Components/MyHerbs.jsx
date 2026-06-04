@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaEye, FaTrashAlt, FaEdit, FaSpinner } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { API_URL, SERVER_URL } from "../../api";
 
 const MyHerbs = () => {
   const [herbs, setHerbs] = useState([]);
@@ -26,11 +27,11 @@ const MyHerbs = () => {
       }
 
       const response = await fetch(
-        `http://localhost:5001/api/herbs/my-herbs/${user._id || user.id}`,
+        `${API_URL}/herbs/my-herbs/${user._id || user.id}`,
         {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         }
       );
 
@@ -75,13 +76,13 @@ const MyHerbs = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/herbs/${editingId}`, {
+      const response = await fetch(`${API_URL}/herbs/${editingId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(editedHerb)
+        body: JSON.stringify(editedHerb),
       });
 
       const data = await response.json();
@@ -105,11 +106,11 @@ const MyHerbs = () => {
     
     if (window.confirm(`Are you sure you want to delete "${herb.name}"?`)) {
       try {
-        const response = await fetch(`http://localhost:5001/api/herbs/${id}`, {
+        const response = await fetch(`${API_URL}/herbs/${id}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         });
 
         const data = await response.json();
@@ -202,7 +203,9 @@ const MyHerbs = () => {
                 <img
                   src={
                     herb.image
-                      ? `http://localhost:5001${herb.image}`
+                      ? herb.image.startsWith("/")
+                        ? `${SERVER_URL}${herb.image}`
+                        : herb.image
                       : "https://via.placeholder.com/300x200?text=No+Image"
                   }
                   alt={herb.name}
@@ -282,7 +285,7 @@ const MyHerbs = () => {
               return (
                 <>
                   <img
-                    src={herb.image ? `http://localhost:5001${herb.image}` : "https://via.placeholder.com/600x300"}
+                    src={herb.image ? (herb.image.startsWith('/') ? `${SERVER_URL}${herb.image}` : herb.image) : "https://via.placeholder.com/600x300"}
                     alt={herb.name}
                     className="w-full h-64 object-cover rounded-md"
                   />
@@ -306,7 +309,7 @@ const MyHerbs = () => {
                     <div className="mt-6">
                       <h4 className="text-xl font-semibold mb-2">Video:</h4>
                       <video controls className="w-full rounded-md">
-                        <source src={`http://localhost:5001${herb.video}`} type="video/mp4" />
+                        <source src={`${SERVER_URL}${herb.video}`} type="video/mp4" />
                         Your browser does not support the video tag.
                       </video>
                     </div>

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
+import { API_URL, normalizeApiResponse } from "./api";
 export const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,11 +38,12 @@ const AuthProvider = ({ children }) => {
   const getHerbs = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/herbs', {
+      const response = await fetch(`${API_URL}/herbs`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       if (!response.ok) {
         const err = await response.text();
         console.error('❌ getHerbs API error:', response.status, err);
@@ -50,10 +52,12 @@ const AuthProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      setHerbs(Array.isArray(data) ? data : (data.herbs || data.data || []));
-      console.log('🌿 Herbs loaded:', Array.isArray(data) ? data.length : (data.herbs ? data.herbs.length : 0));
+      const normalized = normalizeApiResponse(data);
+      setHerbs(normalized);
+      console.log('🌿 Herbs loaded:', normalized.length);
     } catch (error) {
-      console.error("❌ Error fetching herbs:", error);
+      console.error('❌ Error fetching herbs:', error);
+      setHerbs([]);
     } finally {
       setLoading(false);
     }

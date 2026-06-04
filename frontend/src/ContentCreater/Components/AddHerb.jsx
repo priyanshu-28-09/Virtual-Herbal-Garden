@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_URL } from '../../api';
 
 const AddHerb = () => {
   const [formData, setFormData] = useState({
@@ -82,12 +83,12 @@ const AddHerb = () => {
       }
 
       // API call
-      console.log('📡 Sending request to: http://localhost:5001/api/herbs');
+      console.log(`📡 Sending request to: ${API_URL}/herbs`);
       
-      const response = await fetch('http://localhost:5001/api/herbs', {
+      const response = await fetch(`${API_URL}/herbs`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: formDataToSend,
       });

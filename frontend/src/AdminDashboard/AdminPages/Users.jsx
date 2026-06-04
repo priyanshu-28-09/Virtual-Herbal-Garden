@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_URL } from "../../api";
 
 const Users = () => {
   // Notification state
@@ -26,10 +27,10 @@ const Users = () => {
       const token = localStorage.getItem('token');
       
       // ✅ ADDED: Send token in headers
-      const response = await axios.get('http://localhost:5001/api/users/userData', {
+      const response = await axios.get(`${API_URL}/users/userData`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       
       const data = response.data;
@@ -86,7 +87,7 @@ const Users = () => {
       
       // Call your backend API to block the user
       await axios.put(
-        `http://localhost:5001/api/users/block/${id}`, 
+        `${API_URL}/users/block/${id}`,
         { isActive: false },
         {
           headers: {
@@ -127,7 +128,7 @@ const Users = () => {
       
       // Call your backend API to unblock the user
       await axios.put(
-        `http://localhost:5001/api/users/block/${id}`, 
+        `${API_URL}/users/block/${id}`,
         { isActive: true },
         {
           headers: {
@@ -177,7 +178,7 @@ const Users = () => {
         
         // Call your backend API to delete the user
         const response = await axios.delete(
-          `http://localhost:5001/api/users/delete/${id}`,
+          `${API_URL}/users/delete/${id}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`

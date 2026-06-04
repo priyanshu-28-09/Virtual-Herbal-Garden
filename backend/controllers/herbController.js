@@ -98,23 +98,33 @@ exports.getHerb = async (req, res) => {
     if (herbId) {
       const herb = await Herb.findById(herbId);
       if (!herb) {
-        return res.status(404).json({ 
+        return res.status(404).json({
           success: false,
-          message: "Herb not found",
-          herbs: []
+          message: 'Herb not found',
+          data: null,
         });
       }
-      return res.status(200).json({ 
+      return res.status(200).json({
         success: true,
-        herbs: [herb]
+        message: 'Herb fetched successfully',
+        data: herb,
       });
-    } else {
-      const herbs = await Herb.find().sort({ createdAt: -1 });
-      return res.status(200).json(herbs);
     }
+
+    const herbs = await Herb.find().sort({ createdAt: -1 });
+    return res.status(200).json({
+      success: true,
+      message: 'Herbs fetched successfully',
+      data: herbs,
+    });
   } catch (error) {
     console.error('Error fetching herbs:', error);
-    res.status(500).json([]);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch herbs',
+      error: error.message,
+      data: [],
+    });
   }
 };
 

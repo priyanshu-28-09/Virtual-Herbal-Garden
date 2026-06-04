@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import fallbackPlants from "./data/plants";
+import { API_URL, SERVER_URL } from "./api";
 
 const Model3D = ({ plant }) => {
   const modelId = plant?._3DId || plant?.["3dId"] || plant?.threeId;
@@ -23,7 +24,7 @@ const Model3D = ({ plant }) => {
       {showImageFallback ? (
         <div className="w-full h-full bg-[radial-gradient(circle_at_top,_#e9fff1,_#d7f6e3,_#f8fff9)] flex items-center justify-center p-4">
           <img
-            src={plant?.image || "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80"}
+            src={plant?.image?.startsWith('/') ? `${SERVER_URL}${plant.image}` : plant?.image || "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80"}
             alt={plant?.name || "Herb preview"}
             className="h-full w-full object-cover rounded-[28px] border border-emerald-100 shadow-inner"
           />
@@ -158,15 +159,17 @@ const VirtualTour = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showIntro, setShowIntro] = useState(true);
 
+  const getImageSource = (image) => {
+    if (!image) return 'https://via.placeholder.com/800x600?text=Herb+Image';
+    return image.startsWith('/') ? `${SERVER_URL}${image}` : image;
+  };
+
   useEffect(() => {
     const fetchPlantData = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/herbs");
+        const res = await fetch(`${API_URL}/herbs`);
 
         if (!res.ok) {
-          // Non-2xx response
-          const errText = await res.text();
-          throw new Error(errText || `API error: ${res.status}`);
         }
 
         const data = await res.json();

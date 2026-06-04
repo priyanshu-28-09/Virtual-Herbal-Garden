@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Quiz from "./Quiz";
 import axios from "axios";
 import { useAuth } from "../../AuthContext";
+import { API_URL, SERVER_URL, normalizeApiResponse } from "../../api";
 import { FaBookmark, FaLeaf, FaSearch } from "react-icons/fa";
 
 const Home = ({ addBookmark }) => {
@@ -12,21 +13,42 @@ const Home = ({ addBookmark }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [showPlantOfTheDay, setShowPlantOfTheDay] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
   const { user } = useAuth();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5001/api/herbs")
-      .then((res) => {
-        const data = Array.isArray(res.data) ? res.data : [];
-        setPlants(data);
-      })
-      .catch((err) => {
-        console.error("Error fetching plants:", err);
-        setPlants([]);
-      });
+    let mounted = true;
+    const fetchPlants = async () => {
+      setLoading(true);
+      setErrorMessage("");
+      try {
+        const res = await axios.get(`${API_URL}/herbs`);
+        const data = normalizeApiResponse(res);
+        if (mounted) {
+          setPlants(data);
+          if (!data.length) {
+            setErrorMessage('No herbs were returned from the backend.');
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching plants:', err);
+        if (mounted) {
+          setErrorMessage('Backend is unavailable. Please try again later.');
+          setPlants([]);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchPlants();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -59,8 +81,8 @@ const Home = ({ addBookmark }) => {
       });
 
       const response = await axios.post(
-        "http://localhost:5001/api/users/bookmark",
-        { 
+        `${API_URL}/users/bookmark`,
+        {
           userId: user._id,
           plantId: plant._id
         },
@@ -98,6 +120,11 @@ const Home = ({ addBookmark }) => {
   const filteredPlants = plants.filter((plant) =>
     plant.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getImageSource = (image) => {
+    if (!image) return 'https://via.placeholder.com/800x600?text=Herb+Image';
+    return image.startsWith('/') ? `${SERVER_URL}${image}` : image;
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0F1720]">
@@ -148,7 +175,7 @@ const Home = ({ addBookmark }) => {
                   <div className="relative overflow-hidden h-56">
                     <img
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      src={plant.image}
+                      src={getImageSource(plant.image)}
                       alt={plant.name}
                     />
                     <div className="absolute top-3 left-3">

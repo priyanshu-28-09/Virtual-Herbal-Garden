@@ -5,22 +5,37 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const connectDB = async () => {
-  try {
-    if (!process.env.MONGODB_URI) {
-      console.warn('⚠️ MONGODB_URI not set — skipping DB connection.');
-      return false;
-    }
+  const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
 
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    return true;
+  if (!uri) {
+    console.warn('⚠️ MONGO_URI or MONGODB_URI not set — skipping DB connection.');
+    return {
+      connected: false,
+      host: null,
+      error: 'MONGO_URI not configured',
+    };
+  }
+
+  try {
+    const conn = await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log(`✅ MongoDB connected: ${conn.connection.host}`);
+    return {
+      connected: true,
+      host: conn.connection.host,
+      error: null,
+    };
   } catch (error) {
-    console.error(`❌ MongoDB Error: ${error.message}`);
-    return false;
+    console.error(`❌ MongoDB connection failed: ${error.message}`);
+    return {
+      connected: false,
+      host: null,
+      error: error.message,
+    };
   }
 };
 
 module.exports = connectDB;
-
-
-// mongodb+srv://priyanshuvishwakarma3133_db_user:<db_password>@cluster0.xqb5bsx.mongodb.net/?appName=Cluster0cd bac

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import LockClosedIcon from "@heroicons/react/solid/LockClosedIcon";
 import axios from "axios";
 import { useAuth } from "../../../AuthContext";
+import { API_URL } from "../../../api"; // fixed path: LoginPages -> Routes -> UserInterface -> src
 
 export default function HerbalLogin({ setIsAuthenticated, setUserRole }) {
   const auth = useAuth() || {};
@@ -72,7 +73,7 @@ export default function HerbalLogin({ setIsAuthenticated, setUserRole }) {
       });
 
       const response = await axios.post(
-        "http://localhost:5001/api/users/login",
+        `${API_URL}/users/login`,
         {
           email: email.trim(),
           password: password.trim(),
@@ -180,7 +181,7 @@ export default function HerbalLogin({ setIsAuthenticated, setUserRole }) {
   const testBackendConnection = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("http://localhost:5001/api/health", {
+      const response = await axios.get(`${API_URL}/health`, {
         timeout: 5001
       });
       console.log("✅ Backend connection successful:", response.data);

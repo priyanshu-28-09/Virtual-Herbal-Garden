@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from './api';
 
 const Auth = () => {
     const [user, setUser] = useState(""); // State for storing user data
@@ -14,7 +15,7 @@ const Auth = () => {
           return;
         }
   
-        const response = await fetch("http://localhost:5001/api/users/profile", {
+        const response = await fetch(`${API_URL}/users/profile`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_URL, normalizeApiResponse } from "../../api";
 import { useAuth } from "../../AuthContext";
 import { FaHeart, FaLeaf } from "react-icons/fa";
 
@@ -29,7 +30,7 @@ const Bookmarks = () => {
         }
 
         // Step 1: Get bookmark IDs
-        const bookmarkResponse = await axios.get("http://localhost:5001/api/users/getbookmark", {
+        const bookmarkResponse = await axios.get(`${API_URL}/users/getbookmark`, {
           headers: { 
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -46,8 +47,8 @@ const Bookmarks = () => {
         }
 
         // Step 2: Fetch all herbs
-        const herbsResponse = await axios.get("http://localhost:5001/api/herbs");
-        const allHerbs = Array.isArray(herbsResponse.data) ? herbsResponse.data : [];
+        const herbsResponse = await axios.get(`${API_URL}/herbs`);
+        const allHerbs = normalizeApiResponse(herbsResponse);
         
         // Step 3: Filter herbs by bookmark IDs
         const bookmarkedHerbs = allHerbs.filter(herb => 
@@ -84,7 +85,7 @@ const Bookmarks = () => {
 
       // ✅ FIX 3: Correct endpoint spelling - romovebookmark -> removebookmark
       const response = await axios.post(
-        "http://localhost:5001/api/users/removebookmark",
+        `${API_URL}/users/removebookmark`,
         {
           userId: user._id,
           plantId: plant._id

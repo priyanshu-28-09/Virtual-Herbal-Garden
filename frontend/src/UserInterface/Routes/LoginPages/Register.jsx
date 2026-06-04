@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '../../../api'; // fixed path: LoginPages -> Routes -> UserInterface -> src
 
 function Register() {
   const [username, setUsername] = useState('');
@@ -29,10 +30,10 @@ function Register() {
 
     try {
       // Choose the correct endpoint based on role
-      let endpoint = 'http://localhost:5001/api/users/register';
+      let endpoint = `${API_URL}/users/register`;
       
       if (selectedRole === 'content-creator') {
-        endpoint = 'http://localhost:5001/api/users/create-content-creator';
+        endpoint = `${API_URL}/users/create-content-creator`;
       }
 
       const response = await axios.post(endpoint, {
