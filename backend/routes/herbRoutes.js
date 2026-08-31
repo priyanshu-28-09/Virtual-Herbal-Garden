@@ -53,14 +53,14 @@ router.post("/", authenticateUser, isContentCreator, upload.fields([
 ]), createHerb);
 
 router.get("/", getHerb);
+router.get("/herbb", herbb);
 router.get("/my-herbs/:userId", authenticateUser, getMyHerbs);
-router.get("/:herbId", getHerb);
+router.put("/status/:herbId", authenticateUser, isAdmin, updateHerbStatus);
 router.put("/:herbId", authenticateUser, isContentCreator, upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'video', maxCount: 1 }
 ]), updateHerb);
-router.put("/status/:herbId", authenticateUser, isAdmin, updateHerbStatus);
-router.delete("/:herbId", authenticateUser, isAdmin, deleteHerb);
-router.get('/herbb', herbb);
+router.delete("/:herbId", authenticateUser, isContentCreator, deleteHerb);
+router.get("/:herbId", getHerb);
 
 module.exports = router;

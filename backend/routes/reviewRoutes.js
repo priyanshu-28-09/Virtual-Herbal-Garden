@@ -5,13 +5,17 @@ const { isAdmin, isContentCreator } = require("../middleware/adminMiddleware");
 
 const router = express.Router();
 
-// POST route for creating a new review (authenticated users)
+// POST review routes
+router.post("/", authenticateUser, createReview);
 router.post("/reviews", authenticateUser, createReview);
 
-// GET route for fetching all reviews for a specific herb
+// GET reviews for herb
+router.get("/herb/:herbId", getReviewsByHerb);
 router.get("/herbs/:herbId/reviews", getReviewsByHerb);
+router.get("/:herbId", getReviewsByHerb);
 
-// DELETE route for deleting a review (Admin/Content Creator)
+// DELETE review
+router.delete("/:reviewId", authenticateUser, deleteReview);
 router.delete("/reviews/:reviewId", authenticateUser, deleteReview);
 
 module.exports = router;

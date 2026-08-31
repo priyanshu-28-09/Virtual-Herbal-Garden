@@ -11,19 +11,20 @@ const { isAdmin } = require('../middleware/adminMiddleware');
 
 const router = express.Router();
 
-// Route to create a new category (admin only)
-router.post('/categories', authenticateUser, isAdmin, createCategory);
-
-// Route to get all categories
+// Routes for both /api/categories and /api/categories/categories
+router.get('/', getAllCategories);
 router.get('/categories', getAllCategories);
 
-// Route to get a category by ID
+router.post('/', authenticateUser, isAdmin, createCategory);
+router.post('/categories', authenticateUser, isAdmin, createCategory);
+
+router.get('/:categoryId', getCategoryById);
 router.get('/categories/:categoryId', getCategoryById);
 
-// Route to update a category (admin only)
+router.put('/:categoryId', authenticateUser, isAdmin, updateCategory);
 router.put('/categories/:categoryId', authenticateUser, isAdmin, updateCategory);
 
-// Route to delete a category (admin only)
+router.delete('/:categoryId', authenticateUser, isAdmin, deleteCategory);
 router.delete('/categories/:categoryId', authenticateUser, isAdmin, deleteCategory);
 
 module.exports = router;

@@ -301,7 +301,7 @@ exports.updateHerbStatus = async (req, res) => {
   }
 };
 
-// Delete herb (Admin only)
+// Delete herb (Admin or Creator)
 exports.deleteHerb = async (req, res) => {
   try {
     const { herbId } = req.params;
@@ -310,8 +310,16 @@ exports.deleteHerb = async (req, res) => {
     console.log('Found herb:', herb);
     if (!herb) {
       return res.status(404).json({ 
-        success: false,
+        success: false, 
         message: "Herb not found" 
+      });
+    }
+
+    // Check authorization (Admin or owner)
+    if (req.user && req.user.role !== 'admin' && (!herb.createdBy || herb.createdBy.toString() !== req.user._id.toString())) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to delete this herb'
       });
     }
 
@@ -333,14 +341,14 @@ exports.deleteHerb = async (req, res) => {
     await Herb.findByIdAndDelete(herbId);
 
     res.status(200).json({ 
-      success: true,
+      success: true, 
       message: "Herb deleted successfully" 
     });
   } catch (error) {
     console.error('Error deleting herb:', error);
     res.status(500).json({ 
-      success: false,
-      message: "Server error",
+      success: false, 
+      message: "Server error", 
       error: error.message 
     });
   }
