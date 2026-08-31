@@ -96,7 +96,8 @@ exports.createContentCreator = async (req, res) => {
 // User Login - FIXED VERSION WITH ISACTIVE CHECK
 exports.login = async (req, res) => {
   try {
-    if (!process.env.MONGODB_URI) {
+    const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+    if (!mongoUri) {
       return res.status(503).json({ message: "Service temporarily unavailable: database not configured" });
     }
     
