@@ -53,5 +53,8 @@ coverage/
 .temp/
 .cache/
 
+# npm config (platform-specific, should not be committed)
+.npmrc
+
 # Uploaded files
 backend/uploads/
