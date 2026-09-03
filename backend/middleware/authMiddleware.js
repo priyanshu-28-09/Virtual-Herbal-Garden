@@ -40,7 +40,6 @@ const authenticateUser = async (req, res, next) => {
     req.user = user;
     req.userId = user._id;
     req.token = token;
-    console.log('User authenticated:', user._id);
     next();
   } catch (error) {
     console.error('Authentication error:', error);

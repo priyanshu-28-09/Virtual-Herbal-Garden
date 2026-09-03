@@ -1,20 +1,21 @@
 const Herb = require("../models/herbModel");
 const path = require('path');
 const fs = require('fs');
+const { logActivity } = require("../utils/activityLogger");
 
 // Create a new herb (Content Creators/Admins) with file upload support
 exports.createHerb = async (req, res) => {
   try {
-    console.log('📝 Request Body:', req.body);
-    console.log('📁 Files:', req.files);
-
     const {
       name,
       herbName, // From AddHerb form
       scientificName,
       botanicalName, // From AddHerb form
+      category,
       description,
       physicalDescription, // From AddHerb form
+      benefits,
+      careInstructions,
       image,
       botanicalInfo,
       habitat,
@@ -37,7 +38,10 @@ exports.createHerb = async (req, res) => {
     const herbData = {
       name: name || herbName,
       scientificName: scientificName || botanicalName,
+      category: category || '',
       description: description || physicalDescription || '',
+      benefits: benefits || '',
+      careInstructions: careInstructions || '',
       botanicalInfo: botanicalInfo || '',
       physicalDescription: physicalDescription || description || '',
       habitat: habitat || habitatDistribution || '',
@@ -72,7 +76,11 @@ exports.createHerb = async (req, res) => {
     const newHerb = new Herb(herbData);
     await newHerb.save();
 
-    console.log('✅ Herb created successfully:', newHerb._id);
+    await logActivity('created_herb', req, {
+      targetType: 'herb',
+      targetId: newHerb._id.toString(),
+      targetName: newHerb.name,
+    });
 
     res.status(201).json({ 
       success: true,
@@ -90,7 +98,7 @@ exports.createHerb = async (req, res) => {
   }
 };
 
-// Get all herbs or a specific herb
+// Get all herbs (with search, filter, pagination) or a specific herb
 exports.getHerb = async (req, res) => {
   try {
     const { herbId } = req.params;
@@ -111,11 +119,45 @@ exports.getHerb = async (req, res) => {
       });
     }
 
-    const herbs = await Herb.find().sort({ createdAt: -1 });
+    // --- Search, filter, pagination ---
+    const { q, category, page = 1, limit = 9 } = req.query;
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit) || 9));
+    const skip = (pageNum - 1) * limitNum;
+
+    let filter = {};
+
+    // Text search (MongoDB $text index)
+    if (q && q.trim()) {
+      filter.$text = { $search: q.trim() };
+    }
+
+    // Category filter (exact match, case-insensitive via regex)
+    if (category && category.trim()) {
+      filter.category = { $regex: new RegExp(`^${category.trim()}$`, 'i') };
+    }
+
+    const [herbs, total] = await Promise.all([
+      Herb.find(filter)
+        .sort(q ? { score: { $meta: 'textScore' } } : { createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      Herb.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(total / limitNum);
+
     return res.status(200).json({
       success: true,
       message: 'Herbs fetched successfully',
       data: herbs,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages,
+      },
     });
   } catch (error) {
     console.error('Error fetching herbs:', error);
@@ -128,18 +170,21 @@ exports.getHerb = async (req, res) => {
   }
 };
 
-// Get all herbs (explicit function for /api/herbs route)
-exports.getAllHerbs = async (req, res) => {
+// Get distinct categories from actual herbs in the database
+exports.getHerbCategories = async (req, res) => {
   try {
-    const herbs = await Herb.find().sort({ createdAt: -1 });
-    res.status(200).json(herbs);
-  } catch (error) {
-    console.error('Error fetching all herbs:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch herbs',
-      error: error.message
+    const categories = await Herb.distinct('category');
+    const filtered = categories
+      .filter((c) => c && c.trim())
+      .map((c) => c.trim())
+      .sort();
+    res.status(200).json({
+      success: true,
+      categories: filtered,
     });
+  } catch (error) {
+    console.error('Error fetching herb categories:', error);
+    res.status(200).json({ success: true, categories: [] });
   }
 };
 
@@ -248,6 +293,12 @@ exports.updateHerb = async (req, res) => {
 
     await herb.save();
 
+    await logActivity('updated_herb', req, {
+      targetType: 'herb',
+      targetId: herb._id.toString(),
+      targetName: herb.name,
+    });
+
     res.status(200).json({ 
       success: true,
       message: "Herb updated successfully", 
@@ -286,6 +337,12 @@ exports.updateHerbStatus = async (req, res) => {
       });
     }
 
+    await logActivity(isActive ? 'activated_herb' : 'deactivated_herb', req, {
+      targetType: 'herb',
+      targetId: herb._id.toString(),
+      targetName: herb.name,
+    });
+
     res.status(200).json({
       success: true,
       message: `Herb ${isActive ? 'activated' : 'deactivated'} successfully`,
@@ -307,7 +364,6 @@ exports.deleteHerb = async (req, res) => {
     const { herbId } = req.params;
 
     const herb = await Herb.findById(herbId);
-    console.log('Found herb:', herb);
     if (!herb) {
       return res.status(404).json({ 
         success: false, 
@@ -339,6 +395,12 @@ exports.deleteHerb = async (req, res) => {
     }
 
     await Herb.findByIdAndDelete(herbId);
+
+    await logActivity('deleted_herb', req, {
+      targetType: 'herb',
+      targetId: herb._id.toString(),
+      targetName: herb.name,
+    });
 
     res.status(200).json({ 
       success: true, 

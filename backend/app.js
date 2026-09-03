@@ -12,6 +12,7 @@ const userRoutes = require('./routes/userRoutes');
 const herbRoutes = require('./routes/herbRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const activityRoutes = require('./routes/activityRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -84,6 +85,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/herbs', herbRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/activity', activityRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

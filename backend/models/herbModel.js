@@ -137,6 +137,8 @@ const herbSchema = new mongoose.Schema(
   }
 );
 
+herbSchema.index({ name: 'text', scientificName: 'text', description: 'text' });
+
 const Herb = mongoose.model('Herb', herbSchema);
 
 module.exports = Herb;

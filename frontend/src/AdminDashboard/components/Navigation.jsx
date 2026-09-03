@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../../LanguageSwitcher";
 
-const Navigation = () => {
+const Navigation = ({ isOpen, onToggle, onClose }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -12,12 +15,8 @@ const Navigation = () => {
 
   const handleConfirmLogout = () => {
     setIsLoggingOut(true);
-
-    // Clear authentication tokens and user info
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    // Redirect to login page
     setTimeout(() => {
       navigate("/login", { replace: true });
     }, 500);
@@ -29,42 +28,76 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#2ECC71] to-[#1ea85a] text-white p-6 z-40 shadow-2xl">
-        <h1 className="text-2xl font-bold mb-8 text-white drop-shadow-md">Admin Dashboard</h1>
+      {/* Mobile hamburger button */}
+      <button
+        onClick={onToggle}
+        className="fixed top-4 left-4 z-50 md:hidden bg-[#2ECC71] text-white p-2 rounded-lg shadow-lg hover:bg-[#1ea85a] transition-colors"
+        aria-label="Toggle navigation menu"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {isOpen ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
+
+      {/* Backdrop overlay on mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <nav
+        className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#2ECC71] to-[#1ea85a] dark:from-[#0a2e1a] dark:to-[#071c10] text-white p-6 z-40 shadow-2xl transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
+        <h1 className="text-2xl font-bold mb-8 text-white drop-shadow-md">{t('common.adminTitle')}</h1>
         <ul className="space-y-3 flex flex-col gap-2">
           <li>
             <Link
               to="/admin/dashboard"
+              onClick={onClose}
               className="block px-4 py-3 rounded-lg text-white/90 hover:bg-white/15 hover:text-white transition-all font-semibold"
             >
-              📊 Dashboard
+              📊 {t('nav.dashboard')}
             </Link>
           </li>
           <li>
             <Link
               to="/admin/users"
+              onClick={onClose}
               className="block px-4 py-3 rounded-lg text-white/90 hover:bg-white/15 hover:text-white transition-all font-semibold"
             >
-              👥 Users
+              👥 {t('nav.users')}
             </Link>
           </li>
           <li>
             <Link
               to="/admin/manage-content"
+              onClick={onClose}
               className="block px-4 py-3 rounded-lg text-white/90 hover:bg-white/15 hover:text-white transition-all font-semibold"
             >
-              📝 Manage Content
+              📝 {t('nav.manageContent')}
             </Link>
           </li>
         </ul>
 
         {/* Logout Button */}
-        <div className="mt-auto absolute bottom-6 left-6 right-6">
+        <div className="mt-auto absolute bottom-6 left-6 right-6 space-y-3">
+          <div className="flex justify-center">
+            <LanguageSwitcher variant="inverse" />
+          </div>
           <button
             className="w-full px-4 py-3 bg-red-500/90 rounded-lg text-white hover:bg-red-600 transition-all font-semibold hover:shadow-lg"
             onClick={handleLogoutClick}
           >
-            Logout
+            {t('common.logout')}
           </button>
         </div>
       </nav>
@@ -93,10 +126,10 @@ const Navigation = () => {
             </div>
 
             <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">
-              Confirm Logout
+              {t('common.confirmLogout')}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-              Are you sure you want to logout from your account?
+              {t('common.logoutConfirmMsg')}
             </p>
 
             <div className="flex gap-3">
@@ -118,10 +151,10 @@ const Navigation = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Logging out...
+                    {t('common.loggingOut')}
                   </span>
                 ) : (
-                  'Logout'
+                  t('common.logout')
                 )}
               </button>
             </div>
@@ -129,7 +162,7 @@ const Navigation = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

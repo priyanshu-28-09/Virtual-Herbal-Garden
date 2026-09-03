@@ -15,7 +15,6 @@ const isAdmin = async (req, res, next) => {
       return res.status(403).json({ message: "Access denied. Admins only" });
     }
     
-    console.log('Admin access granted to user:', user._id);
     next();
   } catch (err) {
     console.error(err);

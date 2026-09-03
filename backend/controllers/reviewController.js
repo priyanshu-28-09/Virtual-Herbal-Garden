@@ -17,21 +17,14 @@ exports.createReview = async (req, res) => {
       return res.status(404).json({ message: "Herb not found" });
     }
 
-    // Create a new review
     const newReview = new Review({
-      herb: herbId,
-      user: userId,
+      herbId,
+      userId,
       rating,
       comment,
     });
 
     await newReview.save();
-
-    // Add the review to the herb's reviews array
-    if (herb.reviews) {
-      herb.reviews.push(newReview._id);
-      await herb.save();
-    }
 
     res.status(201).json({ message: "Review created successfully", newReview });
   } catch (error) {
@@ -44,14 +37,14 @@ exports.createReview = async (req, res) => {
 exports.getReviewsByHerb = async (req, res) => {
   try {
     const { herbId } = req.params;
-    
-    // Find herb and populate reviews
-    const herb = await Herb.findById(herbId).populate("reviews");
+
+    const herb = await Herb.findById(herbId);
     if (!herb) {
       return res.status(404).json({ message: "Herb not found" });
     }
 
-    res.status(200).json({ reviews: herb.reviews || [] });
+    const reviews = await Review.find({ herbId }).populate("userId", "username email");
+    res.status(200).json({ reviews });
   } catch (error) {
     console.error("Error fetching reviews:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -65,13 +58,12 @@ exports.deleteReview = async (req, res) => {
     const userId = req.user?._id || req.userId;
 
     // Find the review
-    const review = await Review.findById(reviewId).populate("user");
+    const review = await Review.findById(reviewId).populate("userId");
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
 
-    // Check if the user is the creator of the review or an admin
-    const reviewAuthorId = review.user?._id?.toString() || review.user?.toString();
+    const reviewAuthorId = review.userId?._id?.toString() || review.userId?.toString();
     const isOwner = reviewAuthorId === userId?.toString();
     const isAdminUser = req.user?.role === 'admin';
 
@@ -79,16 +71,6 @@ exports.deleteReview = async (req, res) => {
       return res.status(403).json({ message: "You are not authorized to delete this review" });
     }
 
-    // Delete the review from the herb's reviews array
-    if (review.herb) {
-      const herb = await Herb.findById(review.herb);
-      if (herb && herb.reviews) {
-        herb.reviews.pull(reviewId);
-        await herb.save();
-      }
-    }
-
-    // Delete the review from the database
     await Review.findByIdAndDelete(reviewId);
 
     res.status(200).json({ message: "Review deleted successfully" });

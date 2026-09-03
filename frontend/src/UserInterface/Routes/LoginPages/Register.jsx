@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { API_URL } from '../../../api'; // fixed path: LoginPages -> Routes -> UserInterface -> src
+import LanguageSwitcher from '../../../LanguageSwitcher';
 
 function Register() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,12 +20,12 @@ function Register() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('register.passwordMismatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError(t('register.passwordTooShort'));
       return;
     }
 
@@ -45,7 +48,7 @@ function Register() {
       alert(response.data.message);
       window.location.href = '/login';
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || t('register.registrationFailed'));
     } finally {
       setLoading(false);
     }
@@ -57,7 +60,10 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#E6FFF5] to-[#B8F6D1] dark:from-[#0F1720] dark:to-[#153726] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#E6FFF5] to-[#B8F6D1] dark:from-[#0F1720] dark:to-[#153726] flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSwitcher />
+      </div>
       <div className="w-full max-w-5xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Left Side - Information Section */}
@@ -65,10 +71,10 @@ function Register() {
             <div className="space-y-6">
               <div>
                 <h1 className="text-5xl font-bold bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-4">
-                  🌿 Welcome to AYUSH
+                  🌿 {t('register.welcomeTitle')}
                 </h1>
                 <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
-                  Join our community and embark on a journey through nature's healing wonders. Discover the ancient wisdom of Ayurvedic herbs and transform your wellness journey.
+                  {t('register.welcomeSubtitle')}
                 </p>
               </div>
 
@@ -76,24 +82,24 @@ function Register() {
                 <div className="flex items-start gap-4">
                   <div className="text-3xl mt-1">🌱</div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Explore Medicinal Herbs</h3>
-                    <p className="text-gray-700 dark:text-gray-300">Discover 100+ medicinal herbs with detailed information</p>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('register.featureExploreTitle')}</h3>
+                    <p className="text-gray-700 dark:text-gray-300">{t('register.featureExploreDesc')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
                   <div className="text-3xl mt-1">📚</div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Learn Ancient Wisdom</h3>
-                    <p className="text-gray-700 dark:text-gray-300">Access traditional Ayurvedic knowledge and practices</p>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('register.featureLearnTitle')}</h3>
+                    <p className="text-gray-700 dark:text-gray-300">{t('register.featureLearnDesc')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
                   <div className="text-3xl mt-1">🎯</div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">3D Virtual Tours</h3>
-                    <p className="text-gray-700 dark:text-gray-300">Experience herbs in an interactive 3D environment</p>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('register.featureTourTitle')}</h3>
+                    <p className="text-gray-700 dark:text-gray-300">{t('register.featureTourDesc')}</p>
                   </div>
                 </div>
               </div>
@@ -103,10 +109,10 @@ function Register() {
           {/* Right Side - Form Section */}
           <div className="bg-white dark:bg-[#0F1720] rounded-3xl shadow-2xl p-8 md:p-10 border border-gray-200 dark:border-gray-800">
             <h2 className="text-4xl font-bold text-center bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-2">
-              Create Account
+              {t('register.createAccount')}
             </h2>
             <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
-              Join the herbal garden community today
+              {t('register.communityTagline')}
             </p>
 
             {error && (
@@ -119,11 +125,11 @@ function Register() {
               {/* Username Input */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Username
+                  {t('auth.username')}
                 </label>
                 <input
                   type="text"
-                  placeholder="Choose your username"
+                  placeholder={t('register.chooseUsernamePlaceholder')}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -135,11 +141,11 @@ function Register() {
               {/* Email Input */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address
+                  {t('auth.emailAddress')}
                 </label>
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('auth.emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -151,11 +157,11 @@ function Register() {
               {/* Password Input */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Password
+                  {t('auth.password')}
                 </label>
                 <input
                   type="password"
-                  placeholder="Create a password (min 6 characters)"
+                  placeholder={t('register.createPasswordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -167,11 +173,11 @@ function Register() {
               {/* Confirm Password Input */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Confirm Password
+                  {t('auth.confirmPassword')}
                 </label>
                 <input
                   type="password"
-                  placeholder="Re-enter your password"
+                  placeholder={t('register.reEnterPasswordPlaceholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -183,7 +189,7 @@ function Register() {
               {/* Role Selection Radio Buttons - ADMIN REMOVED */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                  Register as
+                  {t('register.registerAs')}
                 </label>
                 <div className="flex flex-wrap items-center gap-6">
                   <div className="flex items-center space-x-2">
@@ -201,7 +207,7 @@ function Register() {
                       htmlFor="register-role-content-creator" 
                       className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
                     >
-                      Content Creator
+                      {t('auth.roleCreator')}
                     </label>
                   </div>
                   
@@ -220,7 +226,7 @@ function Register() {
                       htmlFor="register-role-user" 
                       className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
                     >
-                      User
+                      {t('auth.roleUser')}
                     </label>
                   </div>
                 </div>
@@ -232,26 +238,26 @@ function Register() {
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] hover:from-[#27b666] hover:to-[#1a9a51] text-white py-3 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               >
-                {loading ? 'Creating Account...' : '🌿 Join the Garden'}
+                {loading ? t('register.creatingAccount') : `🌿 ${t('register.joinGarden')}`}
               </button>
             </form>
 
             {/* Divider */}
             <div className="my-6 flex items-center gap-4">
               <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
-              <span className="text-gray-500 dark:text-gray-400 text-sm">Or</span>
+              <span className="text-gray-500 dark:text-gray-400 text-sm">{t('register.or')}</span>
               <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
             </div>
 
             {/* Already a Member Link */}
             <div className="text-center">
               <p className="text-gray-700 dark:text-gray-300">
-                Already have an account?{' '}
+                {t('auth.haveAccount')}{' '}
                 <Link
                   to="/login"
                   className="font-bold text-[#2ECC71] hover:text-[#1ea85a] transition-colors duration-200"
                 >
-                  Log in here
+                  {t('auth.loginLink')}
                 </Link>
               </p>
             </div>
@@ -262,7 +268,7 @@ function Register() {
                 to="/landing"
                 className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#2ECC71] transition-colors duration-200"
               >
-                ← Back to Landing Page
+                ← {t('register.backToLanding')}
               </Link>
             </div>
           </div>

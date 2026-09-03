@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const Herb = require("../models/herbModel");
 const mongoose = require("mongoose");
+const { logActivity } = require("../utils/activityLogger");
 
 // User Registration
 exports.register = async (req, res) => {
@@ -121,26 +122,15 @@ exports.login = async (req, res) => {
     
     const normalizedRole = role ? roleMap[role] || role.toLowerCase().replace(/\s+/g, '-') : null;
     
-    console.log("=== LOGIN ATTEMPT ===");
-    console.log("Email:", email);
-    console.log("Role from frontend:", role);
-    console.log("Normalized role:", normalizedRole);
-    
     // Find user by email
     const user = await User.findOne({ email });
     
     if (!user) {
-      console.log("❌ User not found with email:", email);
       return res.status(400).json({ message: "Invalid email or password." });
     }
     
-    console.log("✅ User found!");
-    console.log("User role in DB:", user.role);
-    console.log("User isActive:", user.isActive);
-    
     // ✅ CHECK IF USER IS BLOCKED - IMPORTANT!
     if (user.isActive === false) {
-      console.log("❌ User account is blocked");
       return res.status(403).json({ 
         message: "Your account has been blocked. Please contact support." 
       });
@@ -148,27 +138,18 @@ exports.login = async (req, res) => {
     
     // Check if role matches
     if (normalizedRole && user.role !== normalizedRole) {
-      console.log("❌ Role mismatch!");
-      console.log("Expected:", normalizedRole);
-      console.log("Got:", user.role);
-      
       return res.status(400).json({ 
         message: `This email is registered as ${user.role}, not ${normalizedRole}. Please select the correct role.` 
       });
     }
 
     // Verify password
-    console.log("Verifying password...");
     const isMatch = await bcrypt.compare(password, user.password);
     
     if (!isMatch) {
-      console.log("❌ Password incorrect");
       return res.status(400).json({ message: "Invalid email or password." });
     }
 
-    console.log("✅ Password correct!");
-    console.log("✅ LOGIN SUCCESSFUL");
-    
     // Generate token
     const token = jwt.sign(
       { userId: user._id, role: user.role }, 
@@ -185,6 +166,11 @@ exports.login = async (req, res) => {
       bookmarks: user.bookmarks,
       isActive: user.isActive
     };
+
+    req.user = user;
+    await logActivity('user_login', req, {
+      targetName: user.username,
+    });
     
     res.status(200).json({ token, user: userResponse });
   } catch (error) {
@@ -211,7 +197,6 @@ exports.logout = async (req, res) => {
 exports.getUserProfile = async (req, res) => {
   try {
     const userId = req.userId;
-    console.log(req.token);
 
     if (!userId) {
       return res.status(404).json({ message: "User not found" });
@@ -233,9 +218,9 @@ exports.getUserProfile = async (req, res) => {
 // bookmark
 exports.bookmark = async (req, res) => {
   try {
-    const { userId, plantId } = req.body;
-    console.log(req.body);
-    
+    const { plantId } = req.body;
+    const userId = req.user?._id || req.userId;
+
     if (!userId || !plantId) {
       return res.status(400).json({ message: "User ID and Herb ID are required" });
     }
@@ -261,7 +246,6 @@ exports.bookmark = async (req, res) => {
 
 exports.getUserBookmarks = async (req, res) => {
   try {
-    console.log(req.body, "lucky");
     const userId = req.user._id;
 
     const user = await User.findById(userId);
@@ -279,7 +263,8 @@ exports.getUserBookmarks = async (req, res) => {
 
 exports.removebookmark = async (req, res) => {
   try {
-    const { userId, plantId } = req.body;
+    const { plantId } = req.body;
+    const userId = req.user?._id || req.userId;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -321,7 +306,6 @@ exports.userData = async (req, res) => {
       role: { $in: ['user', 'content-creator'] },
     }).select('-password');
     
-    console.log(`✅ Fetched ${users.length} users`);
     res.status(200).json(users);
   } catch (err) {
     console.error('Error in userData:', err);
@@ -336,11 +320,8 @@ exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
     
-    console.log(`🗑️ Delete request for user ID: ${id}`);
-    
     // Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.log('❌ Invalid user ID format');
       return res.status(400).json({ 
         success: false,
         message: 'Invalid user ID format' 
@@ -351,7 +332,6 @@ exports.deleteUser = async (req, res) => {
     const user = await User.findById(id);
     
     if (!user) {
-      console.log('❌ User not found');
       return res.status(404).json({ 
         success: false,
         message: 'User not found' 
@@ -360,7 +340,6 @@ exports.deleteUser = async (req, res) => {
     
     // Prevent deletion of admin accounts
     if (user.role === 'admin') {
-      console.log('❌ Attempted to delete admin account');
       return res.status(403).json({ 
         success: false,
         message: 'Cannot delete admin accounts' 
@@ -369,7 +348,6 @@ exports.deleteUser = async (req, res) => {
     
     // Prevent users from deleting themselves (if logged in user ID matches)
     if (req.user && req.user._id.toString() === id) {
-      console.log('❌ User attempted to delete themselves');
       return res.status(403).json({ 
         success: false,
         message: 'You cannot delete your own account' 
@@ -379,7 +357,11 @@ exports.deleteUser = async (req, res) => {
     // Delete the user
     await User.findByIdAndDelete(id);
     
-    console.log(`✅ User deleted successfully: ${user.email}`);
+    await logActivity('deleted_user', req, {
+      targetType: 'user',
+      targetId: user._id.toString(),
+      targetName: user.username,
+    });
     
     res.status(200).json({ 
       success: true,
@@ -407,12 +389,8 @@ exports.blockUser = async (req, res) => {
     const { id } = req.params;
     const { isActive } = req.body;
     
-    console.log(`🔒 Block/Unblock request for user ID: ${id}`);
-    console.log(`Setting isActive to: ${isActive}`);
-    
     // Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.log('❌ Invalid user ID format');
       return res.status(400).json({ 
         success: false,
         message: 'Invalid user ID format' 
@@ -421,7 +399,6 @@ exports.blockUser = async (req, res) => {
     
     // Validate isActive is a boolean
     if (typeof isActive !== 'boolean') {
-      console.log('❌ isActive must be boolean');
       return res.status(400).json({ 
         success: false,
         message: 'isActive must be a boolean value (true or false)' 
@@ -432,7 +409,6 @@ exports.blockUser = async (req, res) => {
     const user = await User.findById(id);
     
     if (!user) {
-      console.log('❌ User not found');
       return res.status(404).json({ 
         success: false,
         message: 'User not found' 
@@ -441,7 +417,6 @@ exports.blockUser = async (req, res) => {
     
     // Prevent blocking admin accounts
     if (user.role === 'admin') {
-      console.log('❌ Attempted to block admin account');
       return res.status(403).json({ 
         success: false,
         message: 'Cannot block/unblock admin accounts' 
@@ -450,7 +425,6 @@ exports.blockUser = async (req, res) => {
     
     // Prevent users from blocking themselves
     if (req.user && req.user._id.toString() === id) {
-      console.log('❌ User attempted to block themselves');
       return res.status(403).json({ 
         success: false,
         message: 'You cannot block/unblock your own account' 
@@ -462,7 +436,12 @@ exports.blockUser = async (req, res) => {
     await user.save();
     
     const action = isActive ? 'unblocked (activated)' : 'blocked (deactivated)';
-    console.log(`✅ User ${action}: ${user.email}`);
+
+    await logActivity(isActive ? 'activated_user' : 'blocked_user', req, {
+      targetType: 'user',
+      targetId: user._id.toString(),
+      targetName: user.username,
+    });
     
     res.status(200).json({ 
       success: true,
@@ -476,11 +455,166 @@ exports.blockUser = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Error updating user status:', error);
+    console.error('Error updating user status:', error);
     res.status(500).json({ 
       success: false,
       message: 'Server error while updating user status', 
       error: error.message 
     });
+  }
+};
+
+// ============= USER ACCOUNT MANAGEMENT =============
+
+// Change password
+exports.changePassword = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Current and new password are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Change email
+exports.changeEmail = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { newEmail, password } = req.body;
+
+    if (!newEmail || !password) {
+      return res.status(400).json({ message: "New email and password are required" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Password is incorrect" });
+    }
+
+    const existing = await User.findOne({ email: newEmail.toLowerCase() });
+    if (existing && existing._id.toString() !== userId) {
+      return res.status(400).json({ message: "Email is already in use" });
+    }
+
+    user.email = newEmail.toLowerCase();
+    await user.save();
+
+    res.status(200).json({ message: "Email changed successfully", email: user.email });
+  } catch (error) {
+    console.error("Error changing email:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Update profile (username, bio, phone)
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { username, bio, phone } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (username !== undefined) user.username = username;
+    if (bio !== undefined) user.bio = bio;
+    if (phone !== undefined) user.phone = phone;
+
+    await user.save();
+
+    const updated = await User.findById(userId).select("-password");
+    res.status(200).json({ message: "Profile updated successfully", user: updated });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Forgot password (generates reset token)
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    // Always return success to prevent email enumeration
+    if (!user) {
+      return res.status(200).json({ message: "If an account exists with this email, a reset link has been sent." });
+    }
+
+    const resetToken = jwt.sign(
+      { userId: user._id, purpose: "password-reset" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // In production, send email here. For now return token for dev/testing.
+    res.status(200).json({
+      message: "If an account exists with this email, a reset link has been sent.",
+      ...(process.env.NODE_ENV !== "production" && { resetToken }),
+    });
+  } catch (error) {
+    console.error("Error in forgotPassword:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Public stats (no auth required)
+exports.getPublicStats = async (req, res) => {
+  try {
+    const Herb = require("../models/herbModel");
+    const Category = require("../models/categoryModel");
+
+    const [herbCount, userCount, categoryCount] = await Promise.all([
+      Herb.countDocuments({ status: "approved" }),
+      User.countDocuments({ role: "user" }),
+      Category.countDocuments(),
+    ]);
+
+    res.status(200).json({
+      herbs: herbCount || 0,
+      users: userCount || 0,
+      categories: categoryCount || 0,
+    });
+  } catch (error) {
+    console.error("Error fetching public stats:", error);
+    res.status(200).json({ herbs: 0, users: 0, categories: 0 });
   }
 };

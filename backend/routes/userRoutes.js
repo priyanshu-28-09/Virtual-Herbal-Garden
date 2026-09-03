@@ -12,7 +12,12 @@ const {
   createAdmin, 
   createContentCreator,
   deleteUser,      
-  blockUser        
+  blockUser,
+  changePassword,
+  changeEmail,
+  updateProfile,
+  forgotPassword,
+  getPublicStats        
 } = require('../controllers/userController');
 const authenticateUser = require('../middleware/authMiddleware');
 const router = express.Router();
@@ -31,7 +36,7 @@ router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', logout);
 router.post('/create-admin', authenticateUser, authorizeAdmin, createAdmin);
-router.post('/create-content-creator', authenticateUser, authorizeAdmin, createContentCreator);
+router.post('/create-content-creator', createContentCreator);
 router.delete('/delete/:id', authenticateUser, authorizeAdmin, deleteUser);
 router.put('/block/:id', authenticateUser, authorizeAdmin, blockUser);
 router.get('/getCount', authenticateUser, authorizeAdmin, getCount);
@@ -40,5 +45,14 @@ router.get("/profile", authenticateUser, getUserProfile);
 router.post('/bookmark', authenticateUser, bookmark);
 router.get('/getbookmark', authenticateUser, getUserBookmarks);
 router.post('/removebookmark', authenticateUser, removebookmark);
+
+// Account management
+router.put('/change-password', authenticateUser, changePassword);
+router.put('/change-email', authenticateUser, changeEmail);
+router.put('/update-profile', authenticateUser, updateProfile);
+
+// Public
+router.post('/forgot-password', forgotPassword);
+router.get('/stats', getPublicStats);
 
 module.exports = router;

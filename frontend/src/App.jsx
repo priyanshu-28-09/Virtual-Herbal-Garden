@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 
 import AuthProvider, { useAuth } from "./AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
@@ -31,15 +31,15 @@ import Navigation from "./AdminDashboard/components/Navigation";
 
 import ContentCreatorDashboard from "./ContentCreater/Components/ContentCreatorDashboard";
 import ContentCreatorProfile from "./ContentCreater/Components/Profile";
-import ContentCreatorSidebar from "./ContentCreater/Components/sidebar";
+import ContentCreatorSidebar from "./ContentCreater/Components/Sidebar";
 import ContentCreatorMyherbs from "./ContentCreater/Components/MyHerbs";
 import ContentCreatorAddherbs from "./ContentCreater/Components/AddHerb";
 // NotFound Component
 const NotFound = () => (
-  <div className="min-h-screen flex items-center justify-center">
+  <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0B1120]">
     <div className="text-center">
-      <h1 className="text-4xl font-bold">404 - Page Not Found</h1>
-      <p>Oops! The page you're looking for doesn't exist.</p>
+      <h1 className="text-4xl font-bold text-gray-900 dark:text-white">404 - Page Not Found</h1>
+      <p className="text-gray-600 dark:text-gray-400 mt-2">Oops! The page you're looking for doesn't exist.</p>
     </div>
   </div>
 );
@@ -57,11 +57,21 @@ const UserLayout = () => (
 
 // Layout Component for Admin Pages
 const AdminLayout = () => {
-  console.log("AdminLayout rendered");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <Navigation />
-      <div className="flex-1 ml-64">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-[#0B1120]">
+      <Navigation
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen((prev) => !prev)}
+        onClose={() => setSidebarOpen(false)}
+      />
+      <div className="flex-1 md:ml-64">
         <Outlet />
       </div>
     </div>
@@ -69,14 +79,27 @@ const AdminLayout = () => {
 };
 
 // Layout Component for Content Creator Pages
-const ContentCreatorLayout = () => (
-  <div className="flex min-h-screen bg-gray-50">
-    <ContentCreatorSidebar />
-    <div className="flex-1 ml-64">
-      <Outlet />
+const ContentCreatorLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  return (
+    <div className="flex min-h-screen bg-gray-50 dark:bg-[#0B1120]">
+      <ContentCreatorSidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen((prev) => !prev)}
+        onClose={() => setSidebarOpen(false)}
+      />
+      <div className="flex-1 md:ml-64">
+        <Outlet />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -88,13 +111,9 @@ const App = () => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
     
-    console.log("App initialization - checking auth...");
-    
     if (token && user) {
       try {
         const parsedUser = JSON.parse(user);
-        console.log("Found user in localStorage:", parsedUser);
-        console.log("👤 User Role:", parsedUser.role);
         setIsAuthenticated(true);
         setUserRole(parsedUser.role);
       } catch (error) {
@@ -102,32 +121,26 @@ const App = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
-    } else {
-      console.log("No authentication found");
     }
     setLoading(false);
   }, []);
 
   // Function to update authentication state (called from Login component)
   const handleSetAuthenticated = (value) => {
-    console.log("Setting authenticated:", value);
     setIsAuthenticated(value);
   };
 
   const handleSetUserRole = (role) => {
-    console.log("Setting user role:", role);
     setUserRole(role);
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E6FFF5] to-[#B8F6D1]">
-        <div className="text-xl font-semibold text-gray-700">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E6FFF5] to-[#B8F6D1] dark:from-[#0B1120] dark:to-[#0a1f15]">
+        <div className="text-xl font-semibold text-gray-700 dark:text-gray-300">Loading...</div>
       </div>
     );
   }
-
-  console.log("🔍 Current State:", { isAuthenticated, userRole });
 
   return (
     <AuthProvider>
@@ -188,12 +201,7 @@ const App = () => {
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
-              <Route path="manage-content" element={
-                <>
-                  {console.log("ManageContent route accessed")}
-                  <ManageContent />
-                </>
-              } />
+              <Route path="manage-content" element={<ManageContent />} />
               <Route path="logs" element={<AdminLogs />} />
             </Route>
 

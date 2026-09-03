@@ -9,16 +9,12 @@ const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   // Check for authentication on initial load
   useEffect(() => {
-    console.log('🔐 AuthContext: Initializing...');
-    
     const storedToken = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
     
     if (storedToken && userData) {
       try {
         const parsedUser = JSON.parse(userData);
-        console.log('✅ AuthContext: User found in localStorage:', parsedUser);
-        console.log('👤 User Role:', parsedUser.role);
         
         setToken(storedToken);
         setUser(parsedUser);
@@ -28,8 +24,6 @@ const AuthProvider = ({ children }) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
-    } else {
-      console.log('⚠️ AuthContext: No authentication found');
     }
     
     setLoading(false); // ✅ Loading complete
@@ -54,7 +48,6 @@ const AuthProvider = ({ children }) => {
       const data = await response.json();
       const normalized = normalizeApiResponse(data);
       setHerbs(normalized);
-      console.log('🌿 Herbs loaded:', normalized.length);
     } catch (error) {
       console.error('❌ Error fetching herbs:', error);
       setHerbs([]);
@@ -64,7 +57,6 @@ const AuthProvider = ({ children }) => {
   };
   // Login function (can be called from Login component)
   const login = (authToken, userData) => {
-    console.log('🔓 AuthContext: Logging in user:', userData);
     localStorage.setItem("token", authToken);
     localStorage.setItem("user", JSON.stringify(userData));
     setToken(authToken);
@@ -73,7 +65,6 @@ const AuthProvider = ({ children }) => {
   };
   // Logout function
   const logout = () => {
-    console.log('🔒 AuthContext: Logging out...');
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setToken(null);

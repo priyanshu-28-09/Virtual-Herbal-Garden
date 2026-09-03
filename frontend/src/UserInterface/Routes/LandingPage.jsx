@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   BookOpenIcon,
   CubeIcon,
@@ -10,6 +11,21 @@ import {
   MenuIcon,
   XIcon,
 } from "@heroicons/react/outline";
+import { useAuth } from "../../AuthContext";
+import { API_URL } from "../../api";
+import LanguageSwitcher from "../../LanguageSwitcher";
+
+function useProtectedNavigate() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  return (path) => {
+    if (isAuthenticated) {
+      navigate(path);
+    } else {
+      navigate("/login");
+    }
+  };
+}
 
 export default function VirtualHerbalGardenHome() {
   const [dark, setDark] = useState(false);
@@ -35,13 +51,23 @@ export default function VirtualHerbalGardenHome() {
 }
 
 function Navbar({ dark, setDark, mobileMenuOpen, setMobileMenuOpen }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const protectedNavigate = useProtectedNavigate();
 
   const navLinks = [
-    { label: "Home", path: "/landing" },
-    { label: "3D Models", path: "/home/virtualTour" },
-    { label: "About", path: "/home/about" },
+    { label: t('nav.home'), key: 'home', path: "/landing", protected: false },
+    { label: t('nav.3dModels'), key: '3d', path: "/home/virtualTour", protected: true },
+    { label: t('nav.about'), key: 'about', path: "/home/about", protected: true },
   ];
+
+  const handleNav = (item) => {
+    if (item.path === "/landing") {
+      navigate("/landing");
+    } else {
+      protectedNavigate(item.path);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-[#0F1720]/90 border-b border-gray-200 dark:border-gray-800 transition-colors">
@@ -53,16 +79,16 @@ function Navbar({ dark, setDark, mobileMenuOpen, setMobileMenuOpen }) {
             </svg>
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-wide">Virtual Herbal Garden</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Explore & Learn</p>
+            <h1 className="text-lg font-bold tracking-wide">{t('brand.name')}</h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t('brand.tagline')}</p>
           </div>
         </div>
 
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map((item) => (
             <button
-              key={item.label}
-              onClick={() => navigate(item.path)}
+              key={item.key}
+              onClick={() => handleNav(item)}
               className="text-sm font-medium hover:text-[#2ECC71] dark:hover:text-[#58E07A] transition-colors"
             >
               {item.label}
@@ -71,12 +97,13 @@ function Navbar({ dark, setDark, mobileMenuOpen, setMobileMenuOpen }) {
         </div>
 
         <div className="flex items-center gap-4">
+          <LanguageSwitcher />
           <button
             onClick={() => navigate("/login")}
             className="hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-tr from-[#2ECC71] to-[#87E08A] text-white font-semibold shadow-lg hover:scale-105 transition"
           >
             <UserIcon className="w-5 h-5" />
-            Login
+            {t('nav.login')}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -92,9 +119,9 @@ function Navbar({ dark, setDark, mobileMenuOpen, setMobileMenuOpen }) {
         <div className="md:hidden bg-white dark:bg-[#0F1720] border-t border-gray-200 dark:border-gray-800 px-6 py-4 space-y-3">
           {navLinks.map((item) => (
             <button
-              key={item.label}
+              key={item.key}
               onClick={() => {
-                navigate(item.path);
+                handleNav(item);
                 setMobileMenuOpen(false);
               }}
               className="block w-full text-left py-2 text-sm font-medium hover:text-[#2ECC71]"
@@ -109,25 +136,47 @@ function Navbar({ dark, setDark, mobileMenuOpen, setMobileMenuOpen }) {
 }
 
 function HeroSection() {
+  const { t } = useTranslation();
+  const [stats, setStats] = useState({ herbs: 0, users: 0, categories: 0 });
+
+  useEffect(() => {
+    let mounted = true;
+    fetch(`${API_URL}/users/stats`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (mounted) {
+          setStats({
+            herbs: data.herbs || 0,
+            users: data.users || 0,
+            categories: data.categories || 0,
+          });
+        }
+      })
+      .catch(() => {
+        if (mounted) setStats({ herbs: 0, users: 0, categories: 0 });
+      });
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[#E6FFF5] to-[#B8F6D1] dark:from-[#0F1720] dark:to-[#153726] py-20 lg:py-32">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-[#2ECC71]/30 to-transparent rounded-full blur-3xl pointer-events-none" />
       <div className="container mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-12 items-center relative z-10">
         <div className="space-y-6">
           <span className="inline-block px-4 py-1 rounded-full bg-[#2ECC71]/20 text-[#2ECC71] dark:text-[#58E07A] text-sm font-semibold">
-            🌿 100+ Medicinal Plants
+            🌿 {stats.herbs ? `${stats.herbs}+` : '100+'} {t('landing.heroBadgePlural')}
           </span>
           <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight">
-            Discover the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2ECC71] to-[#58E07A]">Healing Power</span> of Nature
+            {t('landing.heroTitle1')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2ECC71] to-[#58E07A]">{t('landing.heroTitle2')}</span> {t('landing.heroTitle3')}
           </h1>
           <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            Explore an immersive digital encyclopedia of medicinal plants. Learn about their uses, history, and interact with stunning 3D models—all in multiple languages[web:32][web:34].
+            {t('landing.heroSubtitle')}
           </p>
           <HeroButtonsSection />
           <div className="flex items-center gap-8 pt-4">
-            <Stat number="100+" label="Plants" />
-            <Stat number="15+" label="Categories" />
-            <Stat number="5K+" label="Users" />
+            <Stat number={stats.herbs ? `${stats.herbs}+` : '100+'} label={t('landing.statPlants')} />
+            <Stat number={stats.categories ? `${stats.categories}+` : '15+'} label={t('landing.statCategories')} />
+            <Stat number={stats.users ? `${stats.users}+` : '5K+'} label={t('landing.statUsers')} />
           </div>
         </div>
 
@@ -136,7 +185,7 @@ function HeroSection() {
             <img
               src="/IMG/lush-green-herb-garden-flourishing-under-gentle-rainfall-vibrant-foliage-basking-sunlight-generative-ai-aesthetic-image-398924704.webp"
               alt="Medicinal herbs garden"
-              className="w-full h-[500px] object-cover"
+              className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover"
             />
           </div>
           <div className="absolute -bottom-6 -left-6 bg-white dark:bg-[#0B1220] p-6 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-800 max-w-xs">
@@ -145,8 +194,8 @@ function HeroSection() {
                 <SparklesIcon className="w-8 h-8 text-[#2ECC71]" />
               </div>
               <div>
-                <h4 className="font-bold text-lg">Interactive Learning</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">3D models & detailed guides</p>
+                <h4 className="font-bold text-lg">{t('landing.interactiveLearning')}</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('landing.interactiveLearningDesc')}</p>
               </div>
             </div>
           </div>
@@ -157,15 +206,16 @@ function HeroSection() {
 }
 
 function HeroButtonsSection() {
-  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const protectedNavigate = useProtectedNavigate();
   return (
     <div className="flex flex-wrap gap-4">
       <button
-        onClick={() => navigate("/home/virtualTour")}
+        onClick={() => protectedNavigate("/home/virtualTour")}
         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-2 border-[#2ECC71] text-[#2ECC71] dark:text-[#58E07A] font-semibold hover:bg-[#2ECC71] hover:text-white transition"
       >
         <CubeIcon className="w-5 h-5" />
-        View 3D Models
+        {t('landing.heroCta')}
       </button>
     </div>
   );
@@ -181,6 +231,7 @@ function Stat({ number, label }) {
 }
 
 function FeaturedHerbs() {
+  const { t } = useTranslation();
   const herbs = [
     {
       name: "Tulsi (Holy Basil)",
@@ -206,8 +257,8 @@ function FeaturedHerbs() {
     <section className="py-16 bg-gray-50 dark:bg-[#071519]">
       <div className="container mx-auto px-6 lg:px-12">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-extrabold mb-4">Featured Medicinal Plants</h2>
-          <p className="text-gray-600 dark:text-gray-400">Explore our curated collection of powerful healing herbs[web:32][web:34]</p>
+          <h2 className="text-4xl font-extrabold mb-4">{t('landing.featuredTitle')}</h2>
+          <p className="text-gray-600 dark:text-gray-400">{t('landing.featuredSubtitle')}</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {herbs.map((herb, i) => (
@@ -220,6 +271,7 @@ function FeaturedHerbs() {
 }
 
 function HerbCard({ name, latin, uses, image }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <div className="group bg-white dark:bg-[#0F1720] rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:scale-105 transition-all duration-300">
@@ -237,7 +289,7 @@ function HerbCard({ name, latin, uses, image }) {
           onClick={() => navigate("/home/story")}
           className="inline-flex items-center gap-2 text-[#2ECC71] dark:text-[#58E07A] font-semibold hover:underline"
         >
-          Learn More →
+          {t('common.learnMore')} →
         </button>
       </div>
     </div>
@@ -245,17 +297,18 @@ function HerbCard({ name, latin, uses, image }) {
 }
 
 function WhyChooseUs() {
+  const { t } = useTranslation();
   const features = [
-    { icon: <BookOpenIcon className="w-8 h-8" />, title: "Comprehensive Database", desc: "100+ plants with detailed information" },
-    { icon: <CubeIcon className="w-8 h-8" />, title: "Interactive 3D Models", desc: "Rotate and explore plants in detail" },
-    { icon: <GlobeAltIcon className="w-8 h-8" />, title: "Multilingual Support", desc: "Available in English, Hindi & more" },
-    { icon: <SparklesIcon className="w-8 h-8" />, title: "Regular Updates", desc: "New plants added every month" },
+    { icon: <BookOpenIcon className="w-8 h-8" />, title: t('landing.featureDatabase'), desc: t('landing.featureDatabaseDesc') },
+    { icon: <CubeIcon className="w-8 h-8" />, title: t('landing.feature3d'), desc: t('landing.feature3dDesc') },
+    { icon: <GlobeAltIcon className="w-8 h-8" />, title: t('landing.featureMultilingual'), desc: t('landing.featureMultilingualDesc') },
+    { icon: <SparklesIcon className="w-8 h-8" />, title: t('landing.featureUpdates'), desc: t('landing.featureUpdatesDesc') },
   ];
 
   return (
     <section className="py-20 bg-white dark:bg-[#0F1720]">
       <div className="container mx-auto px-6 lg:px-12">
-        <h2 className="text-4xl font-extrabold text-center mb-12">Why Choose Our Platform?</h2>
+        <h2 className="text-4xl font-extrabold text-center mb-12">{t('landing.whyChoosePlatform')}</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((f, i) => (
             <div key={i} className="text-center p-6 rounded-2xl bg-gray-50 dark:bg-[#071519] border border-gray-100 dark:border-gray-800 hover:shadow-lg transition">
@@ -273,25 +326,26 @@ function WhyChooseUs() {
 }
 
 function CategoriesSection() {
-  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const protectedNavigate = useProtectedNavigate();
   const categories = [
-    { name: "Respiratory", color: "bg-blue-100 text-blue-700", count: 25 },
-    { name: "Digestive", color: "bg-orange-100 text-orange-700", count: 18 },
-    { name: "Skin Care", color: "bg-pink-100 text-pink-700", count: 22 },
-    { name: "Immunity", color: "bg-green-100 text-green-700", count: 30 },
-    { name: "Pain Relief", color: "bg-purple-100 text-purple-700", count: 15 },
-    { name: "Mental Health", color: "bg-indigo-100 text-indigo-700", count: 12 },
+    { name: "Respiratory", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300", count: 25 },
+    { name: "Digestive", color: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300", count: 18 },
+    { name: "Skin Care", color: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300", count: 22 },
+    { name: "Immunity", color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300", count: 30 },
+    { name: "Pain Relief", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300", count: 15 },
+    { name: "Mental Health", color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300", count: 12 },
   ];
 
   return (
     <section className="py-16 bg-gray-50 dark:bg-[#071519]">
       <div className="container mx-auto px-6 lg:px-12">
-        <h2 className="text-4xl font-extrabold text-center mb-12">Browse by Category</h2>
+        <h2 className="text-4xl font-extrabold text-center mb-12">{t('landing.categoriesTitle')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((cat, i) => (
             <button
               key={i}
-              onClick={() => navigate("/home/virtualTour")}
+              onClick={() => protectedNavigate("/home/virtualTour")}
               className={`${cat.color} p-6 rounded-2xl text-center font-semibold hover:scale-105 transition shadow-md`}
             >
               <div className="text-2xl mb-2">{cat.count}</div>
@@ -305,6 +359,7 @@ function CategoriesSection() {
 }
 
 function TestimonialsSection() {
+  const { t } = useTranslation();
   const testimonials = [
     { name: "Dr. Priya Sharma", role: "Ayurvedic Practitioner", text: "An invaluable resource for anyone interested in herbal medicine. The 3D models are exceptional!" },
     { name: "Rahul Mehta", role: "Botany Student", text: "Perfect for my research. The multilingual support makes it accessible to my entire family." },
@@ -314,7 +369,7 @@ function TestimonialsSection() {
   return (
     <section className="py-20 bg-white dark:bg-[#0F1720]">
       <div className="container mx-auto px-6 lg:px-12">
-        <h2 className="text-4xl font-extrabold text-center mb-12">What Our Users Say</h2>
+        <h2 className="text-4xl font-extrabold text-center mb-12">{t('landing.testimonialsTitle')}</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {testimonials.map((t, i) => (
             <div key={i} className="p-6 rounded-2xl bg-gray-50 dark:bg-[#071519] border border-gray-100 dark:border-gray-800 shadow-md">
@@ -335,17 +390,18 @@ function TestimonialsSection() {
 }
 
 function NewsletterCTA() {
+  const { t } = useTranslation();
   return (
     <section className="py-16 bg-gradient-to-tr from-[#E6FFF5] to-[#B8F6D1] dark:from-[#0F1720] dark:to-[#153726]">
       <div className="container mx-auto px-6 lg:px-12 text-center">
-        <h2 className="text-4xl font-extrabold mb-4">Stay Updated with New Plants</h2>
+        <h2 className="text-4xl font-extrabold mb-4">{t('landing.newsletterTitle2')}</h2>
         <p className="text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-          Subscribe to our newsletter and get notified when we add new plants, features, and educational content[web:34].
+          {t('landing.newsletterSubtitle2')}
         </p>
         <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
           <input
             type="email"
-            placeholder="Enter your email"
+            placeholder={t('landing.newsletterEmail')}
             className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#2ECC71] outline-none"
             required
           />
@@ -353,7 +409,7 @@ function NewsletterCTA() {
             type="submit"
             className="px-6 py-3 rounded-xl bg-gradient-to-tr from-[#2ECC71] to-[#87E08A] text-white font-semibold shadow-lg hover:scale-105 transition"
           >
-            Subscribe
+            {t('landing.newsletterCta')}
           </button>
         </form>
       </div>
@@ -362,42 +418,44 @@ function NewsletterCTA() {
 }
 
 function Footer() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const protectedNavigate = useProtectedNavigate();
   return (
     <footer className="py-12 bg-white dark:bg-[#0C1821] border-t border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-6 lg:px-12">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">Virtual Herbal Garden</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Exploring medicinal plants to preserve traditional knowledge</p>
+            <h3 className="font-bold text-lg mb-4">{t('brand.name')}</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('footer.tagline')}</p>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <h4 className="font-semibold mb-4">{t('landing.quickLinks')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><button onClick={() => navigate("/home/virtualTour")} className="hover:text-[#2ECC71]">Encyclopedia</button></li>
-              <li><button onClick={() => navigate("/home/virtualTour")} className="hover:text-[#2ECC71]">3D Models</button></li>
-              <li><button onClick={() => navigate("/landing")} className="hover:text-[#2ECC71]">Categories</button></li>
+              <li><button onClick={() => protectedNavigate("/home/virtualTour")} className="hover:text-[#2ECC71]">{t('nav.3dModels')}</button></li>
+              <li><button onClick={() => protectedNavigate("/home/virtualTour")} className="hover:text-[#2ECC71]">{t('nav.virtualTour')}</button></li>
+              <li><button onClick={() => protectedNavigate("/home/about")} className="hover:text-[#2ECC71]">{t('nav.about')}</button></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Resources</h4>
+            <h4 className="font-semibold mb-4">{t('footer.resources')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><button onClick={() => navigate("/home/story")} className="hover:text-[#2ECC71]">Blog</button></li>
-              <li><button onClick={() => navigate("/home/about")} className="hover:text-[#2ECC71]">Research</button></li>
-              <li><button onClick={() => navigate("/landing")} className="hover:text-[#2ECC71]">FAQs</button></li>
+              <li><button onClick={() => protectedNavigate("/home/story")} className="hover:text-[#2ECC71]">{t('footer.blog')}</button></li>
+              <li><button onClick={() => protectedNavigate("/home/about")} className="hover:text-[#2ECC71]">{t('home.featuredTitle')}</button></li>
+              <li><button onClick={() => navigate("/landing")} className="hover:text-[#2ECC71]">{t('nav.home')}</button></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Legal</h4>
+            <h4 className="font-semibold mb-4">{t('landing.legal')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><button onClick={() => navigate("/landing")} className="hover:text-[#2ECC71]">Privacy Policy</button></li>
-              <li><button onClick={() => navigate("/landing")} className="hover:text-[#2ECC71]">Terms of Service</button></li>
-              <li><button onClick={() => navigate("/landing")} className="hover:text-[#2ECC71]">Contact</button></li>
+              <li><button onClick={() => navigate("/landing")} className="hover:text-[#2ECC71]">{t('landing.privacyPolicy')}</button></li>
+              <li><button onClick={() => navigate("/landing")} className="hover:text-[#2ECC71]">{t('landing.termsOfService')}</button></li>
+              <li><button onClick={() => navigate("/landing")} className="hover:text-[#2ECC71]">{t('landing.contact')}</button></li>
             </ul>
           </div>
         </div>
         <div className="border-t border-gray-200 dark:border-gray-800 pt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-          © 2025 Virtual Herbal Garden. All rights reserved.
+          © 2025 Virtual Herbal Garden. {t('footer.rights')}
         </div>
       </div>
     </footer>

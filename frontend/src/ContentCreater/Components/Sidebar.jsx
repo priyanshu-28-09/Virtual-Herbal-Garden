@@ -1,10 +1,18 @@
-import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../../LanguageSwitcher";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onToggle, onClose }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    onClose();
+  }, [location.pathname]);
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -12,12 +20,8 @@ const Sidebar = () => {
 
   const handleConfirmLogout = () => {
     setIsLoggingOut(true);
-
-    // Clear authentication tokens and user info
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    // Navigate to login page
     setTimeout(() => {
       navigate("/login", { replace: true });
     }, 500);
@@ -27,62 +31,71 @@ const Sidebar = () => {
     setShowLogoutModal(false);
   };
 
+  const linkClass = ({ isActive }) =>
+    `px-4 py-3 rounded-lg transition-all ${
+      isActive
+        ? "bg-white/20 text-white border-l-4 border-white"
+        : "text-white/90 hover:bg-white/10 hover:text-white"
+    }`;
+
   return (
     <>
-      <div className="sidebar fixed w-64 bg-gradient-to-b from-[#2ECC71] to-[#1ea85a] text-white h-screen flex flex-col p-6 font-semibold z-40 shadow-xl">
-        {/* Title */}
-        <h2 className="text-2xl font-bold mb-8 text-white drop-shadow-md">Content Creator</h2>
+      {/* Mobile hamburger button */}
+      <button
+        onClick={onToggle}
+        className="fixed top-4 left-4 z-50 md:hidden bg-[#2ECC71] text-white p-2 rounded-lg shadow-lg hover:bg-[#1ea85a] transition-colors"
+        aria-label="Toggle navigation menu"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {isOpen ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
+
+      {/* Backdrop overlay on mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div
+        className={`sidebar fixed top-0 left-0 w-64 bg-gradient-to-b from-[#2ECC71] to-[#1ea85a] dark:from-[#0a2e1a] dark:to-[#071c10] text-white h-screen flex flex-col p-6 font-semibold z-40 shadow-xl transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
+        <h2 className="text-2xl font-bold mb-8 text-white drop-shadow-md">{t('common.contentCreatorTitle')}</h2>
         
-        {/* Navigation Links */}
         <nav className="flex flex-col gap-3 flex-grow">
-          <NavLink
-            to="/content-creator/dashboard"
-            className={({ isActive }) =>
-              isActive
-                ? "px-4 py-3 bg-white/20 rounded-lg text-white border-l-4 border-white transition-all"
-                : "px-4 py-3 text-white/90 hover:bg-white/10 rounded-lg transition-all hover:text-white"
-            }
-          >
-            Dashboard
+          <NavLink to="/content-creator/dashboard" className={linkClass} onClick={onClose}>
+            {t('nav.dashboard')}
           </NavLink>
-          <NavLink
-            to="/content-creator/add-herb"
-            className={({ isActive }) =>
-              isActive
-                ? "px-4 py-3 bg-white/20 rounded-lg text-white border-l-4 border-white transition-all"
-                : "px-4 py-3 text-white/90 hover:bg-white/10 rounded-lg transition-all hover:text-white"
-            }
-          >
-            Add Herb
+          <NavLink to="/content-creator/add-herb" className={linkClass} onClick={onClose}>
+            {t('nav.addHerb')}
           </NavLink>
-          <NavLink
-            to="/content-creator/my-herbs"
-            className={({ isActive }) =>
-              isActive
-                ? "px-4 py-3 bg-white/20 rounded-lg text-white border-l-4 border-white transition-all"
-                : "px-4 py-3 text-white/90 hover:bg-white/10 rounded-lg transition-all hover:text-white"
-            }
-          >
-            My Herbs
+          <NavLink to="/content-creator/my-herbs" className={linkClass} onClick={onClose}>
+            {t('nav.myHerbs')}
           </NavLink>
-          <NavLink
-            to="/content-creator/profile"
-            className={({ isActive }) =>
-              isActive
-                ? "px-4 py-3 bg-white/20 rounded-lg text-white border-l-4 border-white transition-all"
-                : "px-4 py-3 text-white/90 hover:bg-white/10 rounded-lg transition-all hover:text-white"
-            }
-          >
-            Profile
+          <NavLink to="/content-creator/profile" className={linkClass} onClick={onClose}>
+            {t('nav.profile')}
           </NavLink>
           
-          {/* Logout Button */}
-          <button
-            onClick={handleLogoutClick}
-            className="bg-red-500/90 text-white py-3 mt-auto rounded-lg hover:bg-red-600 hover:shadow-lg w-full transition-all font-semibold"
-          >
-            Logout
-          </button>
+          <div className="mt-auto">
+            <div className="flex justify-center mb-3">
+              <LanguageSwitcher variant="inverse" />
+            </div>
+            <button
+              onClick={handleLogoutClick}
+              className="bg-red-500/90 text-white py-3 rounded-lg hover:bg-red-600 hover:shadow-lg w-full transition-all font-semibold"
+            >
+              {t('common.logout')}
+            </button>
+          </div>
         </nav>
       </div>
 
@@ -110,10 +123,10 @@ const Sidebar = () => {
             </div>
 
             <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">
-              Confirm Logout
+              {t('common.confirmLogout')}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-              Are you sure you want to logout from your account?
+              {t('common.logoutConfirmMsg')}
             </p>
 
             <div className="flex gap-3">
@@ -135,10 +148,10 @@ const Sidebar = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Logging out...
+                    {t('common.loggingOut')}
                   </span>
                 ) : (
-                  'Logout'
+                  t('common.logout')
                 )}
               </button>
             </div>
@@ -146,7 +159,7 @@ const Sidebar = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

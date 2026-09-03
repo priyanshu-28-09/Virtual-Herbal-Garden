@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { API_URL } from '../../api';
 
 const Setting = () => {
+  const { t } = useTranslation();
   const [activeSetting, setActiveSetting] = useState(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -19,26 +22,55 @@ const Setting = () => {
     email: '',
     emailPassword: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState('');
 
   const handleSettingClick = (setting) => {
     setActiveSetting(setting === activeSetting ? null : setting);
+    setServerError('');
   };
 
   const validatePassword = () => {
     const errors = {};
-    if (!currentPassword) errors.currentPassword = 'Current password is required.';
-    if (!newPassword) errors.newPassword = 'New password is required.';
-    if (newPassword && !reenterPassword) errors.reenterPassword = 'Please re-enter the new password.';
-    if (newPassword !== reenterPassword) errors.reenterPassword = 'Passwords do not match.';
+    if (!currentPassword) errors.currentPassword = t('settings.currentPasswordRequired');
+    if (!newPassword) errors.newPassword = t('settings.newPasswordRequired');
+    if (newPassword && newPassword.length < 6) errors.newPassword = t('settings.newPasswordMin', { count: 6 });
+    if (newPassword && !reenterPassword) errors.reenterPassword = t('settings.reenterRequired');
+    if (newPassword !== reenterPassword) errors.reenterPassword = t('settings.passwordMismatch');
     
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleChangePassword = () => {
-    if (validatePassword()) {
+  const handleChangePassword = async () => {
+    if (!validatePassword()) return;
+    setServerError('');
+    setIsLoading(true);
+    setFormErrors({});
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/users/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setServerError(data.message || t('settings.failedChangePassword'));
+        return;
+      }
       setIsPasswordChanged(true);
-      alert('Password changed successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setReenterPassword('');
+      alert(t('settings.passwordChanged'));
+    } catch (error) {
+      setServerError(error.message || t('settings.networkError'));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -47,23 +79,47 @@ const Setting = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
     if (!email) {
-      errors.email = 'Email is required.';
+      errors.email = t('settings.emailRequired');
     } else if (!emailRegex.test(email)) {
-      errors.email = 'Invalid email format.';
+      errors.email = t('settings.invalidEmail');
     }
 
     if (!emailPassword) {
-      errors.emailPassword = 'Email password is required.';
+      errors.emailPassword = t('settings.emailPasswordRequired');
     }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleChangeEmail = () => {
-    if (validateEmail()) {
+  const handleChangeEmail = async () => {
+    if (!validateEmail()) return;
+    setServerError('');
+    setIsLoading(true);
+    setFormErrors({});
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/users/change-email`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ newEmail: email, password: emailPassword }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setServerError(data.message || t('settings.failedChangeEmail'));
+        return;
+      }
       setIsEmailChanged(true);
-      alert(`Email changed to: ${email}`);
+      setEmail('');
+      setEmailPassword('');
+      alert(t('settings.emailChanged'));
+    } catch (error) {
+      setServerError(error.message || t('settings.networkError'));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,10 +141,10 @@ const Setting = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-bold text-5xl bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-2">
-            ⚙️ Settings
+            ⚙️ {t('settings.title')}
           </h1>
           <p className="text-gray-700 dark:text-gray-300 text-lg">
-            Manage your account and preferences
+            {t('settings.subtitle')}
           </p>
           <div className="mt-4 h-1 w-40 bg-gradient-to-r from-[#2ECC71] to-[#87E08A] rounded-full mx-auto"></div>
         </div>
@@ -96,93 +152,99 @@ const Setting = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Settings Menu */}
           <div className="lg:col-span-1 bg-white dark:bg-[#0F1720] p-6 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 h-fit">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Account Settings</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('settings.accountSettings')}</h3>
             <ul className="space-y-2">
               <li 
                 className={`cursor-pointer p-3 rounded-lg transition-all duration-200 font-semibold ${activeSetting === 'changePassword' ? 'bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`} 
                 onClick={() => handleSettingClick('changePassword')}
               >
-                🔐 Change Password
+                🔐 {t('settings.changePassword')}
               </li>
               <li 
                 className={`cursor-pointer p-3 rounded-lg transition-all duration-200 font-semibold ${activeSetting === 'changeEmail' ? 'bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`} 
                 onClick={() => handleSettingClick('changeEmail')}
               >
-                ✉️ Change Email
+                ✉️ {t('settings.changeEmail')}
               </li>
               <li 
                 className={`cursor-pointer p-3 rounded-lg transition-all duration-200 font-semibold ${activeSetting === 'managePrivacy' ? 'bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`} 
                 onClick={() => handleSettingClick('managePrivacy')}
               >
-                🔒 Privacy
+                🔒 {t('settings.managePrivacy')}
               </li>
               <li 
                 className={`cursor-pointer p-3 rounded-lg transition-all duration-200 font-semibold ${activeSetting === 'notifications' ? 'bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`} 
                 onClick={() => handleSettingClick('notifications')}>
-                🔔 Notifications
+                🔔 {t('settings.notifications')}
               </li>
             </ul>
           </div>
 
           {/* Settings Content */}
           <div className="lg:col-span-2 bg-white dark:bg-[#0F1720] p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800">
+            {activeSetting && serverError && (
+              <div className="mb-6 p-4 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-800 dark:text-red-300 font-semibold">
+                ⚠️ {serverError}
+              </div>
+            )}
+
             {activeSetting === 'changePassword' && (
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">🔐 Change Password</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">🔐 {t('settings.changePassword')}</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Current Password</label>
-                    <input type="password" placeholder="Enter current password" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('settings.currentPassword')}</label>
+                    <input type="password" placeholder={t('settings.currentPasswordPlaceholder')} className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
                     {formErrors.currentPassword && <p className="text-red-500 text-sm mt-1">✕ {formErrors.currentPassword}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">New Password</label>
-                    <input type="password" placeholder="Enter new password" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('settings.newPassword')}</label>
+                    <input type="password" placeholder={t('settings.newPasswordPlaceholder')} className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
                     {formErrors.newPassword && <p className="text-red-500 text-sm mt-1">✕ {formErrors.newPassword}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Confirm New Password</label>
-                    <input type="password" placeholder="Re-enter new password" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={reenterPassword} onChange={(e) => setReenterPassword(e.target.value)} />
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('settings.confirmNewPassword')}</label>
+                    <input type="password" placeholder={t('settings.confirmNewPasswordPlaceholder')} className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={reenterPassword} onChange={(e) => setReenterPassword(e.target.value)} />
                     {formErrors.reenterPassword && <p className="text-red-500 text-sm mt-1">✕ {formErrors.reenterPassword}</p>}
                   </div>
-                  <button onClick={handleChangePassword} className="w-full mt-6 bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white py-3 rounded-xl hover:shadow-lg transition-all duration-200 font-semibold">
-                    Update Password
+                  <button onClick={handleChangePassword} disabled={isLoading} className="w-full mt-6 bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white py-3 rounded-xl hover:shadow-lg transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isLoading ? `⏳ ${t('settings.updating')}` : t('settings.updatePassword')}
                   </button>
-                  {isPasswordChanged && <p className="text-green-500 text-sm mt-3 font-semibold">✓ Password changed successfully!</p>}
+                  {isPasswordChanged && <p className="text-green-500 text-sm mt-3 font-semibold">✓ {t('settings.passwordChanged')}</p>}
                 </div>
               </div>
             )}
 
             {activeSetting === 'changeEmail' && (
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">✉️ Change Email</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">✉️ {t('settings.changeEmail')}</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">New Email Address</label>
-                    <input type="email" placeholder="Enter new email" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('settings.newEmailAddress')}</label>
+                    <input type="email" placeholder={t('settings.newEmailPlaceholder')} className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={email} onChange={(e) => setEmail(e.target.value)} />
                     {formErrors.email && <p className="text-red-500 text-sm mt-1">✕ {formErrors.email}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Password Confirmation</label>
-                    <input type="password" placeholder="Enter your password" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={emailPassword} onChange={(e) => setEmailPassword(e.target.value)} />
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('settings.passwordConfirmation')}</label>
+                    <input type="password" placeholder={t('settings.passwordConfirmationPlaceholder')} className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2ECC71]" value={emailPassword} onChange={(e) => setEmailPassword(e.target.value)} />
                     {formErrors.emailPassword && <p className="text-red-500 text-sm mt-1">✕ {formErrors.emailPassword}</p>}
                   </div>
-                  <button onClick={handleChangeEmail} className="w-full mt-6 bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white py-3 rounded-xl hover:shadow-lg transition-all duration-200 font-semibold">
-                    Update Email
+                  <button onClick={handleChangeEmail} disabled={isLoading} className="w-full mt-6 bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white py-3 rounded-xl hover:shadow-lg transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isLoading ? `⏳ ${t('settings.updating')}` : t('settings.updateEmail')}
                   </button>
-                  {isEmailChanged && <p className="text-green-500 text-sm mt-3 font-semibold">✓ Email changed successfully to: {email}</p>}
+                  {isEmailChanged && <p className="text-green-500 text-sm mt-3 font-semibold">✓ {t('settings.emailChangedTo', { email })}</p>}
                 </div>
               </div>
             )}
 
             {activeSetting === 'managePrivacy' && (
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">🔒 Privacy Settings</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">🔒 {t('settings.privacySettings')}</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-                    <span className="font-semibold text-gray-800 dark:text-white">Profile Visibility</span>
+                    <span className="font-semibold text-gray-800 dark:text-white">{t('settings.profileVisibility')}</span>
                     <button onClick={handleTogglePrivacy} className={`py-2 px-6 font-semibold rounded-lg transition-all duration-200 ${privacy ? 'bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white' : 'bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white'}`}>
-                      {privacy ? '✓ Public' : '✕ Private'}
+                      {privacy ? `✓ ${t('settings.public')}` : `✕ ${t('settings.private')}`}
                     </button>
                   </div>
                 </div>
@@ -191,18 +253,18 @@ const Setting = () => {
 
             {activeSetting === 'notifications' && (
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">🔔 Notifications</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">🔔 {t('settings.notifications')}</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-                    <span className="font-semibold text-gray-800 dark:text-white">Email Notifications</span>
+                    <span className="font-semibold text-gray-800 dark:text-white">{t('settings.emailNotifications')}</span>
                     <button onClick={handleToggleEmailNotifications} className={`py-2 px-6 font-semibold rounded-lg transition-all duration-200 ${emailNotifications ? 'bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white' : 'bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white'}`}>
-                      {emailNotifications ? '✓ Enabled' : '✕ Disabled'}
+                      {emailNotifications ? `✓ ${t('settings.enabled')}` : `✕ ${t('settings.disabled')}`}
                     </button>
                   </div>
                   <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-                    <span className="font-semibold text-gray-800 dark:text-white">Push Notifications</span>
+                    <span className="font-semibold text-gray-800 dark:text-white">{t('settings.pushNotifications')}</span>
                     <button onClick={handleTogglePushNotifications} className={`py-2 px-6 font-semibold rounded-lg transition-all duration-200 ${pushNotifications ? 'bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white' : 'bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white'}`}>
-                      {pushNotifications ? '✓ Enabled' : '✕ Disabled'}
+                      {pushNotifications ? `✓ ${t('settings.enabled')}` : `✕ ${t('settings.disabled')}`}
                     </button>
                   </div>
                 </div>
@@ -213,7 +275,7 @@ const Setting = () => {
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">⚙️</div>
                 <p className="text-gray-600 dark:text-gray-400 text-lg">
-                  Select a setting from the left to manage your account
+                  {t('settings.selectSetting')}
                 </p>
               </div>
             )}

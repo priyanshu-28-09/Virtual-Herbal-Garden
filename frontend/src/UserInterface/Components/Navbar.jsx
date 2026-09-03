@@ -1,9 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../../AuthContext';
+import LanguageSwitcher from '../../LanguageSwitcher';
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -52,21 +55,22 @@ const Navbar = () => {
           </button>
         </div>
     
-        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:flex items-center space-y-6 md:space-y-0 md:space-x-6 absolute md:static top-16 left-0 w-full md:w-auto bg-[#1a4d2e] md:bg-transparent z-10 p-4 md:p-0 ml-[500px] rounded-b-lg md:rounded-b-none`}>
+        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:flex items-center space-y-6 md:space-y-0 md:space-x-6 absolute md:static top-16 left-0 right-0 md:right-auto md:w-auto w-full md:w-auto bg-[#1a4d2e] md:bg-transparent z-10 p-4 md:p-0 rounded-b-lg md:rounded-b-none`}>
           <ul className="flex flex-col md:flex-row md:space-x-6 text-white">
-            <Link to="/home"><li className="rounded-lg bg-white/20 px-4 py-2 cursor-pointer hover:bg-white/30 transition-all">Home</li></Link>
-            <Link to="/home/about"><li className="rounded-lg bg-white/20 px-4 py-2 cursor-pointer hover:bg-white/30 transition-all">About</li></Link>
-            <Link to="/home/virtualTour"><li className="rounded-lg bg-white/20 px-4 py-2 cursor-pointer hover:bg-white/30 transition-all">Virtual Tour</li></Link>
+            <Link to="/home"><li className="rounded-lg bg-white/20 px-4 py-2 cursor-pointer hover:bg-white/30 transition-all">{t('nav.home')}</li></Link>
+            <Link to="/home/about"><li className="rounded-lg bg-white/20 px-4 py-2 cursor-pointer hover:bg-white/30 transition-all">{t('nav.about')}</li></Link>
+            <Link to="/home/virtualTour"><li className="rounded-lg bg-white/20 px-4 py-2 cursor-pointer hover:bg-white/30 transition-all">{t('nav.virtualTour')}</li></Link>
           </ul>
         </div>
 
         <div className="flex items-center space-x-6">
+          <LanguageSwitcher />
           {isAuthenticated && (
             <button 
               className="bg-red-500 py-2 px-6 rounded-lg bg-opacity-100 hover:bg-red-600 transition-all hover:shadow-lg font-semibold text-white" 
               onClick={handleLogoutClick}
             >
-              Logout
+              {t('nav.logout')}
             </button>
           )}
 
@@ -78,15 +82,15 @@ const Navbar = () => {
               <FaUserCircle />
             </button>
             {isProfileMenuOpen && (
-              <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-[#0F1720] shadow-2xl rounded-xl py-2 border border-gray-200 dark:border-gray-700">
+              <div className="absolute right-0 mt-3 w-44 sm:w-48 bg-white dark:bg-[#0F1720] shadow-2xl rounded-xl py-2 border border-gray-200 dark:border-gray-700">
                 <Link to="/home/bookmarks" className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-[#E6FFF5] dark:hover:bg-[#1a2f24] transition-all hover:text-[#2ECC71] font-semibold rounded-lg">
-                  🔖 Bookmarks
+                  🔖 {t('nav.bookmarks')}
                 </Link>
                 <Link to="/home/profile" className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-[#E6FFF5] dark:hover:bg-[#1a2f24] transition-all hover:text-[#2ECC71] font-semibold rounded-lg">
-                  👤 Profile
+                  👤 {t('nav.profile')}
                 </Link>
                 <Link to="/home/setting" className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-[#E6FFF5] dark:hover:bg-[#1a2f24] transition-all hover:text-[#2ECC71] font-semibold rounded-lg">
-                  ⚙️ Settings
+                  ⚙️ {t('nav.settings')}
                 </Link>
               </div>
             )}
@@ -118,10 +122,10 @@ const Navbar = () => {
             </div>
 
             <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">
-              Confirm Logout
+              {t('auth.logoutTitle')}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-              Are you sure you want to logout from your account?
+              {t('auth.logoutMessage')}
             </p>
 
             <div className="flex gap-3">
@@ -130,7 +134,7 @@ const Navbar = () => {
                 disabled={isLoggingOut}
                 className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition disabled:opacity-50"
               >
-                Cancel
+                {t('auth.logoutCancel')}
               </button>
               <button
                 onClick={handleConfirmLogout}
@@ -143,10 +147,10 @@ const Navbar = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Logging out...
+                    {t('auth.loggingOut')}
                   </span>
                 ) : (
-                  'Logout'
+                  t('auth.logoutConfirm')
                 )}
               </button>
             </div>
@@ -154,7 +158,7 @@ const Navbar = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

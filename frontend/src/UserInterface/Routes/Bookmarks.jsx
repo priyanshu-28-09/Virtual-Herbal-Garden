@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { API_URL, normalizeApiResponse } from "../../api";
 import { useAuth } from "../../AuthContext";
 import { FaHeart, FaLeaf } from "react-icons/fa";
 
 const Bookmarks = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [notification, setNotification] = useState("");
   const [bookmarkedPlants, setBookmarkedPlants] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  console.log("User:", user);
-  console.log("User bookmarks:", user?.bookmarks);
 
   // Fetch bookmarks on component mount
   useEffect(() => {
@@ -23,7 +22,6 @@ const Bookmarks = () => {
         const token = localStorage.getItem('token');
         
         if (!token) {
-          console.log("No token found, cannot fetch bookmarks");
           setBookmarkedPlants([]);
           setLoading(false);
           return;
@@ -38,7 +36,6 @@ const Bookmarks = () => {
         });
 
         const bookmarkIds = Array.isArray(bookmarkResponse.data) ? bookmarkResponse.data : [];
-        console.log("Bookmark IDs:", bookmarkIds);
 
         if (bookmarkIds.length === 0) {
           setBookmarkedPlants([]);
@@ -55,7 +52,6 @@ const Bookmarks = () => {
           bookmarkIds.includes(herb._id)
         );
 
-        console.log("Fetched bookmarked plants:", bookmarkedHerbs);
         setBookmarkedPlants(bookmarkedHerbs);
         setLoading(false);
       } catch (error) {
@@ -78,16 +74,9 @@ const Bookmarks = () => {
     try {
       const token = localStorage.getItem('token');
 
-      console.log("Removing bookmark:", {
-        userId: user._id,
-        plantId: plant._id
-      });
-
-      // ✅ FIX 3: Correct endpoint spelling - romovebookmark -> removebookmark
       const response = await axios.post(
         `${API_URL}/users/removebookmark`,
         {
-          userId: user._id,
           plantId: plant._id
         },
         {
@@ -97,8 +86,6 @@ const Bookmarks = () => {
           }
         }
       );
-
-      console.log("Remove response:", response.data);
 
       if (response.data.success) {
         // Update local state
@@ -112,17 +99,17 @@ const Bookmarks = () => {
         }
 
         // Show notification
-        setNotification(`${plant.name} has been removed from your bookmarks!`);
+        setNotification(t('bookmarks.removed', { name: plant.name }));
         setTimeout(() => setNotification(""), 3000);
       } else {
         console.error("Failed to remove bookmark:", response.data.message);
-        setNotification("Failed to remove bookmark");
+        setNotification(t('bookmarks.removeFailed'));
         setTimeout(() => setNotification(""), 3000);
       }
     } catch (error) {
       console.error("Error removing bookmark:", error);
       console.error("Error details:", error.response?.data);
-      setNotification("Failed to remove bookmark");
+      setNotification(t('bookmarks.removeFailed'));
       setTimeout(() => setNotification(""), 3000);
     }
   };
@@ -132,7 +119,7 @@ const Bookmarks = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-[#E6FFF5] to-[#B8F6D1] dark:from-[#0F1720] dark:to-[#153726]">
         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#2ECC71] mb-4"></div>
-        <p className="text-gray-700 dark:text-gray-300 text-xl">Loading your bookmarks...</p>
+        <p className="text-gray-700 dark:text-gray-300 text-xl">{t('bookmarks.loading')}</p>
       </div>
     );
   }
@@ -142,14 +129,14 @@ const Bookmarks = () => {
       {/* Header */}
       <div className="text-center pt-12 pb-8">
         <h1 className="font-bold text-5xl bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-2">
-          🌿 Your Bookmarked Plants
+          🌿 {t('bookmarks.title')}
         </h1>
         <p className="text-gray-700 dark:text-gray-300 text-lg">
-          Your favorite medicinal herbs collection
+          {t('bookmarks.subtitle')}
         </p>
         {bookmarkedPlants.length > 0 && (
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {bookmarkedPlants.length} plant{bookmarkedPlants.length !== 1 ? 's' : ''} bookmarked
+            {t('bookmarks.count', { count: bookmarkedPlants.length })}
           </p>
         )}
         <div className="mt-4 h-1 w-40 bg-gradient-to-r from-[#2ECC71] to-[#87E08A] rounded-full mx-auto"></div>
@@ -203,7 +190,7 @@ const Bookmarks = () => {
                     onClick={(event) => handleRemoveBookmark(event, plant)}
                   >
                     <span>✕</span>
-                    <span>Remove from Bookmarks</span>
+                    <span>{t('bookmarks.remove')}</span>
                   </button>
                 </div>
               </div>
@@ -215,16 +202,16 @@ const Bookmarks = () => {
               <FaLeaf className="text-gray-300 dark:text-gray-700 mx-auto" />
             </div>
             <p className="text-gray-700 dark:text-gray-300 text-2xl font-semibold mb-2">
-              No bookmarks found
+              {t('bookmarks.empty')}
             </p>
             <p className="text-gray-600 dark:text-gray-400 text-lg">
-              Explore plants and bookmark your favorites!
+              {t('bookmarks.emptyDesc')}
             </p>
             <button
               onClick={() => window.location.href = '/home'}
               className="mt-6 px-6 py-3 bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white rounded-xl font-semibold hover:scale-105 transition"
             >
-              Explore Plants
+              {t('bookmarks.exploreCta')}
             </button>
           </div>
         )}

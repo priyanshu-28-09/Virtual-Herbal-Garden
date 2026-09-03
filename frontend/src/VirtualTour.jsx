@@ -1,9 +1,11 @@
 ﻿import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import fallbackPlants from "./data/plants";
 import { API_URL, SERVER_URL } from "./api";
 
 const Model3D = ({ plant }) => {
+  const { t } = useTranslation();
   const modelId = plant?._3DId || plant?.["3dId"] || plant?.threeId;
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -30,7 +32,7 @@ const Model3D = ({ plant }) => {
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-slate-950/10 py-4 px-5 text-center">
             <p className="text-sm font-semibold text-slate-700">
-              {modelId ? "3D preview failed to load. Showing plant image instead." : "No 3D model available yet."}
+              {modelId ? t('tour.modelFailedMsg') : t('tour.modelNone')}
             </p>
           </div>
         </div>
@@ -49,21 +51,21 @@ const Model3D = ({ plant }) => {
           {!loaded && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-[28px] bg-slate-950/30 text-white">
               <div className="h-12 w-12 rounded-full border border-white/30 bg-white/10 animate-pulse" />
-              <p className="text-sm sm:text-base font-medium">Loading 3D model...</p>
+              <p className="text-sm sm:text-base font-medium">{t('tour.modelLoading')}</p>
             </div>
           )}
           <div className="absolute left-4 top-4 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-slate-800">
-            3D model
+            {t('tour.modelBadge')}
           </div>
           <div className="absolute left-4 bottom-4 right-4 flex flex-wrap items-center justify-between gap-2 rounded-3xl bg-white/85 px-4 py-3 text-xs text-slate-700">
-            <span>{plant?.name || "Plant"} preview</span>
+            <span>{plant?.name || t('tour.unnamedPlant')} preview</span>
             <a
               href={`https://sketchfab.com/models/${modelId}`}
               target="_blank"
               rel="noreferrer"
               className="font-semibold text-emerald-700 underline"
             >
-              Open on Sketchfab
+              {t('tour.openSketchfab')}
             </a>
           </div>
         </>
@@ -73,6 +75,7 @@ const Model3D = ({ plant }) => {
 };
 
 const PlantCard = ({ plant, index }) => {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef(null);
 
@@ -90,9 +93,9 @@ const PlantCard = ({ plant, index }) => {
     return () => observer.disconnect();
   }, []);
 
-  const category = plant?.category || "Herbal Medicine";
-  const uses = plant?.uses || plant?.medicinalMethod || "Uses not available yet.";
-  const care = plant?.careInstructions || plant?.habitat || "Care information not available yet.";
+  const category = plant?.category || t('tour.cardCategoryFallback');
+  const uses = plant?.uses || plant?.medicinalMethod || t('tour.usesFallback');
+  const care = plant?.careInstructions || plant?.habitat || t('tour.careFallback');
   const referenceLink = plant?.referenceLink || "#";
 
   return (
@@ -114,36 +117,36 @@ const PlantCard = ({ plant, index }) => {
                 {category}
               </span>
               <span className="rounded-full bg-slate-100 px-4 py-2 text-xs text-slate-600">
-                {plant?.scientificName || "Scientific name missing"}
+                {plant?.scientificName || t('tour.sciNameMissing')}
               </span>
             </div>
-            <h2 className="text-3xl font-extrabold text-slate-900 mb-3">{plant?.name || "Unnamed Plant"}</h2>
-            <p className="text-slate-600 leading-relaxed">{plant?.description || "No description available."}</p>
+            <h2 className="text-3xl font-extrabold text-slate-900 mb-3">{plant?.name || t('tour.unnamedPlant')}</h2>
+            <p className="text-slate-600 leading-relaxed">{plant?.description || t('tour.noDesc')}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-[28px] bg-white border border-emerald-100 p-5 shadow-sm">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700 mb-3">Uses & benefits</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700 mb-3">{t('tour.usesTitle')}</h3>
               <p className="text-sm leading-relaxed text-slate-700">{uses}</p>
             </div>
             <div className="rounded-[28px] bg-slate-950 text-white p-5 shadow-sm">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200 mb-3">Grow & care</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200 mb-3">{t('tour.careTitle')}</h3>
               <p className="text-sm leading-relaxed text-slate-100">{care}</p>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-[28px] bg-slate-50 p-5 border border-slate-200">
-              <h3 className="text-xs uppercase tracking-[0.2em] text-slate-500 mb-2">Preparation</h3>
-              <p className="text-sm text-slate-700">{plant?.plantSuccess || "Herbal advantage details not available."}</p>
+              <h3 className="text-xs uppercase tracking-[0.2em] text-slate-500 mb-2">{t('tour.prepTitle')}</h3>
+              <p className="text-sm text-slate-700">{plant?.plantSuccess || t('tour.prepFallback')}</p>
             </div>
             <div className="rounded-[28px] bg-white p-5 border border-emerald-100">
-              <h3 className="text-xs uppercase tracking-[0.2em] text-slate-500 mb-2">More info</h3>
+              <h3 className="text-xs uppercase tracking-[0.2em] text-slate-500 mb-2">{t('tour.moreInfo')}</h3>
               <a
                 href={referenceLink}
                 target="_blank"
                 rel="noreferrer"
                 className="text-sm font-semibold text-emerald-700 hover:text-emerald-900"
               >
-                Learn more
+                {t('tour.learnMore')}
               </a>
             </div>
           </div>
@@ -154,6 +157,7 @@ const PlantCard = ({ plant, index }) => {
 };
 
 const VirtualTour = () => {
+  const { t } = useTranslation();
   const [plants, setPlants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -186,14 +190,14 @@ const VirtualTour = () => {
         if (herbsArray.length === 0) {
           // Backend returned an empty list — use local sample data
           console.warn('⚠️ /api/herbs returned empty array, using local fallback data.');
-          setErrorMessage('No herbs found in backend. Showing sample herbal collection.');
+          setErrorMessage(t('tour.errorNoHerbs'));
           setPlants(fallbackPlants);
         } else {
           setPlants(herbsArray);
         }
       } catch (err) {
         console.error("Error fetching plants:", err);
-        setErrorMessage("Unable to load backend data. Showing sample herbal plant collection.");
+        setErrorMessage(t('tour.errorLoadFailed'));
         setPlants(fallbackPlants);
       } finally {
         setLoading(false);
@@ -221,7 +225,7 @@ const VirtualTour = () => {
               transition={{ duration: 1.1, ease: "easeOut" }}
               className="text-4xl md:text-5xl font-extrabold tracking-tight"
             >
-              🌿 Virtual Herbal Garden Tour
+              🌿 {t('tour.introTitle')}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 18 }}
@@ -229,7 +233,7 @@ const VirtualTour = () => {
               transition={{ delay: 0.9, duration: 1 }}
               className="mt-4 max-w-2xl text-base md:text-lg text-slate-700"
             >
-              Discover herb lore, plant care, and interactive plant previews in one fresh garden experience.
+              {t('tour.introSubtitle')}
             </motion.p>
           </motion.div>
         )}
@@ -246,19 +250,19 @@ const VirtualTour = () => {
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div className="space-y-4">
                 <div className="inline-flex rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-900">
-                  Nature-inspired herbal encyclopedia
+                  {t('tour.badge')}
                 </div>
                 <h1 className="text-4xl font-bold tracking-tight text-slate-900">
-                  Explore the plant world with curated herb cards.
+                  {t('tour.heading')}
                 </h1>
                 <p className="max-w-2xl text-slate-600 leading-relaxed">
-                  Each plant card includes plant name, scientific name, benefits, care instructions, category, and an image or 3D preview.
+                  {t('tour.subheading')}
                 </p>
               </div>
               <div className="rounded-3xl bg-gradient-to-br from-[#e8fff0] to-[#d4f8dd] p-6 text-slate-800 shadow-inner">
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Available plants</p>
+                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">{t('tour.availableLabel')}</p>
                 <p className="mt-2 text-5xl font-extrabold text-emerald-800">{plants.length}</p>
-                <p className="text-sm text-slate-600">Ready for discovery</p>
+                <p className="text-sm text-slate-600">{t('tour.availableReady')}</p>
               </div>
             </div>
             {errorMessage && (
@@ -270,8 +274,8 @@ const VirtualTour = () => {
 
           {plants.length === 0 ? (
             <div className="rounded-[32px] bg-[#f3fff4] border border-emerald-100 p-10 text-center text-slate-700 shadow-sm">
-              <h2 className="text-2xl font-semibold mb-2">No plants available yet 🌱</h2>
-              <p>Add herbs from the Content Creator panel or check backend API status.</p>
+              <h2 className="text-2xl font-semibold mb-2">{t('tour.noPlants')} 🌱</h2>
+              <p>{t('tour.noPlantsDesc')}</p>
             </div>
           ) : (
             <div className="grid gap-8">
@@ -286,8 +290,8 @@ const VirtualTour = () => {
       {loading && !showIntro && (
         <div className="min-h-screen flex items-center justify-center px-4">
           <div className="rounded-[32px] border border-emerald-100 bg-white/95 p-8 shadow-lg text-center">
-            <p className="text-xl font-semibold text-emerald-800">Loading plants...</p>
-            <p className="mt-2 text-slate-600">If the backend is not available, the sample herb collection will appear.</p>
+            <p className="text-xl font-semibold text-emerald-800">{t('tour.loadingPlants')}</p>
+            <p className="mt-2 text-slate-600">{t('tour.loadingDesc')}</p>
           </div>
         </div>
       )}

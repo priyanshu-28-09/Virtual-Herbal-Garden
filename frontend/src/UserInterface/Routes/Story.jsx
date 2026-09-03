@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const herbalStories = [
   {
@@ -52,6 +53,7 @@ const herbalStories = [
 ];
 
 const Story = () => {
+  const { t } = useTranslation();
   const [selectedStory, setSelectedStory] = useState(null);
 
   return (
@@ -59,10 +61,10 @@ const Story = () => {
       {/* Header */}
       <div className="text-center mb-12 max-w-4xl mx-auto">
         <h1 className="text-5xl font-bold bg-gradient-to-r from-[#2ECC71] to-[#58E07A] bg-clip-text text-transparent mb-4">
-          🌿 Herbal Wisdom & Stories
+          🌿 {t('story.title')}
         </h1>
         <p className="text-xl text-gray-700 dark:text-gray-300 mb-6">
-          Explore inspiring stories about medicinal herbs and their healing powers
+          {t('story.subtitle')}
         </p>
         <div className="h-1 w-40 bg-gradient-to-r from-[#2ECC71] to-[#87E08A] rounded-full mx-auto"></div>
       </div>
@@ -94,7 +96,7 @@ const Story = () => {
                 {story.description}
               </p>
               <button className="mt-4 w-full bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white py-2 rounded-lg hover:shadow-lg transition-all duration-200 font-semibold">
-                Read Story
+                {t('story.readStory')}
               </button>
             </div>
           </div>
@@ -147,7 +149,7 @@ const Story = () => {
                 onClick={() => setSelectedStory(null)}
                 className="w-full bg-gradient-to-r from-[#2ECC71] to-[#1ea85a] text-white py-3 rounded-lg hover:shadow-lg transition-all duration-200 font-semibold"
               >
-                Close Story
+                {t('story.closeStory')}
               </button>
             </div>
           </div>

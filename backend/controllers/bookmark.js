@@ -17,9 +17,6 @@ const bookmarkHerb = async (userId, herbId) => {
     if (!user.bookmarks.includes(herbId)) {
       user.bookmarks.push(herbId);
       await user.save();
-      console.log("Herb bookmarked successfully");
-    } else {
-      console.log("Herb already bookmarked");
     }
   } catch (error) {
     console.error(error);

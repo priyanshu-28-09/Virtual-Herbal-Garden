@@ -5,6 +5,7 @@ const fs = require('fs');
 const {
   createHerb,
   getHerb,
+  getHerbCategories,
   updateHerb,
   deleteHerb,
   herbb,
@@ -53,6 +54,7 @@ router.post("/", authenticateUser, isContentCreator, upload.fields([
 ]), createHerb);
 
 router.get("/", getHerb);
+router.get("/categories", getHerbCategories);
 router.get("/herbb", herbb);
 router.get("/my-herbs/:userId", authenticateUser, getMyHerbs);
 router.put("/status/:herbId", authenticateUser, isAdmin, updateHerbStatus);
