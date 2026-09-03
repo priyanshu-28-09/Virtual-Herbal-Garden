@@ -41,7 +41,10 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'http://localhost:5174',
-  'http://127.0.0.1:5174'
+  'http://127.0.0.1:5174',
+  'https://virtual-herbal-garden.vercel.app',
+  'https://frontend-g7e4kbduo-priyanshu-cb27.vercel.app',
+  'https://frontend-ruby-beta-25.vercel.app'
 ];
 
 app.use(
