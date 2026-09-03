@@ -44,7 +44,10 @@ const allowedOrigins = [
   'http://127.0.0.1:5174',
   'https://virtual-herbal-garden.vercel.app',
   'https://frontend-g7e4kbduo-priyanshu-cb27.vercel.app',
-  'https://frontend-ruby-beta-25.vercel.app'
+  'https://frontend-ruby-beta-25.vercel.app',
+  'https://frontend-azure-omega-p615cp3enc.vercel.app',
+  'https://frontend-krjhc5bqj-priyanshu-28-09s-projects.vercel.app',
+  'https://frontend-r4gevzmxg-priyanshu-28-09s-projects.vercel.app'
 ];
 
 app.use(
